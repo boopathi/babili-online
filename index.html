@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Babili</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net" />
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+
+    <link rel="prefetch" href="static/worker.js" />
+    <link rel="prefetch" href="build/babel-core.js" />
+    <link rel="prefetch" href="build/babel-preset-babili.js" />
+    <link rel="prefetch" href="static/script.js" />
+    <link rel="prefetch" href="//cdn.jsdelivr.net/localforage/1.4.2/localforage.min.js" />
+    <link rel="prefetch" href="//cdn.jsdelivr.net/ace/1.2.3/min/ace.js" />
+  </head>
+  <body>
+    <link href="//fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">
+    <link rel="stylesheet" href="static/styles.css" />
+    <div class="fill-height column">
+      <div class="row center header">
+        <h1 class="title">Babili</h1>
+        <a href="https://babeljs.io/repl/#?babili=true&evaluate=false" class="link" target="_blank">
+          Probably buggy, use the Official REPL
+        </a>
+        <a href="https://github.com/babel/babili" class="img-link" target="_blank">
+          <img src="static/GitHub-Mark-Light-32px.png" width="30" height="30" />
+        </a>
+      </div>
+      <div class="fill-height row">
+        <div class="column fill-height">
+          <div id="input" class="fill-height"></div>
+        </div>
+        <div class="column fill-height">
+          <textarea id="output" class="fill-height"></textarea>
+        </div>
+      </div>
+      <div class="footer">
+        <div>
+          <button id="run" class="btn btn-primary" data-tooltip="Minify (⌘ + ⏎ )">...</button>
+        </div>
+        <div>
+          <button id="purge" class="btn btn-harmful" data-tooltip="Purge Caches">
+            <img src="static/ic_delete_forever_white_24px.svg" width="24" height="24" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="//cdn.jsdelivr.net/localforage/1.4.2/localforage.min.js"></script>
+    <script src="//cdn.jsdelivr.net/ace/1.2.3/min/ace.js"></script>
+    <script src="static/script.js"></script>
+  </body>
+</html>

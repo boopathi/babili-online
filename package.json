@@ -1,0 +1,22 @@
+{
+  "name": "babili-online",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "boopathi",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.18.0",
+    "babel-loader": "^6.2.7",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.18.0",
+    "babel-preset-babili": "^0.0.8",
+    "babel-preset-es2016": "^6.16.0",
+    "babili-webpack-plugin": "^0.0.6",
+    "json-loader": "^0.5.4",
+    "sw-toolbox": "^3.4.0",
+    "webpack": "v2.1.0-beta.25"
+  }
+}
