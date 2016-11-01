@@ -2,8 +2,8 @@ var fs = {};
 var net = {};
 var module = {};
 
-importScripts("/build/babel-core.js");
-importScripts("/build/babel-preset-babili.js");
+importScripts("build/babel-core.js");
+importScripts("build/babel-preset-babili.js");
 
 self.addEventListener('message', function(e) {
   if (e.data.start) {
@@ -15,19 +15,16 @@ self.addEventListener('message', function(e) {
   var input = e.data.input;
   var opts = e.data.opts;
   try {
-    console.log("computing", input);
     var result = Babel.transform(input, {
       presets: [BabiliPreset],
       compact: true,
       minified: true,
       comments: false
     });
-    console.log(result);
   } catch (err) {
     console.log(err);
     self.postMessage(err.toString());
     throw err;
   }
-  console.log(result.code);
   self.postMessage(result.code);
 });
