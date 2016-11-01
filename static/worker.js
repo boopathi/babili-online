@@ -2,8 +2,8 @@ var fs = {};
 var net = {};
 var module = {};
 
-importScripts("build/babel-core.js");
-importScripts("build/babel-preset-babili.js");
+importScripts("../build/babel-core.js");
+importScripts("../build/babel-preset-babili.js");
 
 self.addEventListener('message', function(e) {
   if (e.data.start) {
