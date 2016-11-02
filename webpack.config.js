@@ -1,6 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const BabiliPlugin = require("babili-webpack-plugin");
+const BabiliPreset = require("babel-preset-babili");
 
 module.exports = [
   {
@@ -17,7 +18,8 @@ module.exports = [
       new webpack.optimize.OccurrenceOrderPlugin(),
       new webpack.optimize.DedupePlugin(),
       new BabiliPlugin({
-        comments: false
+        comments: false,
+        babili: BabiliPreset
       })
     ]
   },
@@ -46,7 +48,8 @@ module.exports = [
       new webpack.optimize.OccurrenceOrderPlugin(),
       new webpack.optimize.DedupePlugin(),
       new BabiliPlugin({
-        comments: false
+        comments: false,
+        babili: BabiliPreset
       })
     ],
     module: {
@@ -78,7 +81,8 @@ module.exports = [
       new webpack.optimize.OccurrenceOrderPlugin(),
       new webpack.optimize.DedupePlugin(),
       new BabiliPlugin({
-        comments: false
+        comments: false,
+        babili: BabiliPreset
       })
     ]
   }

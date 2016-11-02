@@ -1,1 +1,6951 @@
-var BabiliPreset=function(r){function s(u){if(o[u])return o[u].exports;var d=o[u]={i:u,l:!1,exports:{}};return r[u].call(d.exports,d,d.exports,s),d.l=!0,d.exports}var o={};return s.m=r,s.c=o,s.i=function(u){return u},s.d=function(u,d,h){Object.defineProperty(u,d,{configurable:!1,enumerable:!0,get:h})},s.n=function(u){var d=u&&u.__esModule?function(){return u['default']}:function(){return u};return s.d(d,'a',d),d},s.o=function(u,d){return Object.prototype.hasOwnProperty.call(u,d)},s.p='',s(s.s=26)}([function(r,s){'use strict';'use strict';var o=Symbol('flipSeen');r.exports=function(u){return{hasSeen:function(h){return!!h[o]},shouldFlip:function(h){function m(x){return u.isUnaryExpression(x,{operator:'!'})?void y++:u.isLogicalExpression(x)?(m(x.left),void m(x.right)):void(!(u.isBinaryExpression(x)&&-1<u.EQUALITY_BINARY_OPERATORS.indexOf(x.operator))&&y--)}var y=1>=arguments.length||void 0===arguments[1]?0:arguments[1];return m(h),0<y},flip:function(h,m){function y(_,q,P){if(x={parent:q,key:P},u.isUnaryExpression(_,{operator:'!'}))return _.argument;if(u.isLogicalExpression(_))return _.operator='&&'===_.operator?'||':'&&',_.left=y(_.left,_,'left'),_.right=y(_.right,_,'right'),_;if(u.isBinaryExpression(_)){var W=void 0;switch(_.operator){case'!==':W='===';break;case'===':W='!==';break;case'!=':W='==';break;case'==':W='!=';}if(W)return _.operator=W,_}return u.unaryExpression('!',_,!0)}var x=void 0,S=y(h);if(S[o]=!0,m&&x){var v=x,E=v.parent,k=v.key;E&&k&&u.isUnaryExpression(E[k],{operator:'!'})&&(E[k]=E[k].argument)}return S}}}},function(r,s){'use strict';'use strict';r.exports=function(o){return function(d){return o.isUnaryExpression(d,{operator:'void'})&&o.isNumericLiteral(d.argument,{value:0})}}},function(r,s){'use strict';'use strict';r.exports=function(o){var u=o.types,d=o.traverse,h=Symbol('seen');return{name:'minify-constant-folding',visitor:{BinaryExpression:function(y){function x(_,q){if(_.isStringLiteral())return _;return _.isBinaryExpression({operator:'+'})?x(_.get(q),q):void 0}var S=void 0,v=void 0;if(!y.get('right').isStringLiteral()){if(!y.get('left').isStringLiteral())return;if(S=y.get('left'),y.get('right').isBinaryExpression({operator:'+'}))v=y.get('right');else return}else if(S=y.get('right'),y.get('left').isBinaryExpression({operator:'+'}))v=y.get('left');else return;var E=x(v,S.key);if(E){var k='right'===S.key?E.node.value+S.node.value:S.node.value+E.node.value;E.replaceWith(u.stringLiteral(k)),y.replaceWith(v.node)}},Expression:function(y){var x=y.node;if(!x[h]&&!y.isLiteral()&&y.isPure()&&!d.hasType(x,y.scope,'Identifier',u.FUNCTION_TYPES)&&!(u.isUnaryExpression(x,{operator:'-'})&&u.isNumericLiteral(x.argument))&&!(u.isUnaryExpression(x,{operator:'!'})&&u.isNumericLiteral(x.argument)&&(0===x.argument.value||1===x.argument.value))&&!(u.isUnaryExpression(x,{operator:'void'})&&u.isNumericLiteral(x.argument,{value:0}))){var S=y.evaluate();if(S.confident){if('number'==typeof S.value&&!Number.isInteger(S.value))return;if('number'==typeof S.value&&0===S.value&&1/S.value==-(1/0)){var v=u.unaryExpression('-',u.numericLiteral(0),!0);return v[h]=!0,void y.replaceWith(v)}var E=u.valueToNode(S.value);E[h]=!0,y.replaceWith(E)}}}}}}},function(r,s,o){'use strict';'use strict';function u(m){if(Array.isArray(m)){for(var y=0,x=Array(m.length);y<m.length;y++)x[y]=m[y];return x}return Array.from(m)}var d='function'==typeof Symbol&&'symbol'==typeof Symbol.iterator?function(m){return typeof m}:function(m){return m&&'function'==typeof Symbol&&m.constructor===Symbol&&m!==Symbol.prototype?'symbol':typeof m},h=o(23);r.exports=function(m){function y(T){var N=T.node;if(T.isBlockStatement()){var O=!1;for(var D=0;D<N.body.length;D++){var w=N.body[D];I.isBlockScoped(w)&&(O=!0)}if(!O)return N.body}return[N]}function x(T){var N=[];if(T.isVariableDeclaration({kind:'var'})){var O=!0,D=!1,w=void 0;try{for(var V,C=T.node.declarations[Symbol.iterator]();!(O=(V=C.next()).done);O=!0){var M=V.value;N.push(I.variableDeclarator(M.id))}}catch(U){D=!0,w=U}finally{try{!O&&C.return&&C.return()}finally{if(D)throw w}}}else T.traverse({VariableDeclaration:function(z){if(z.isVariableDeclaration({kind:'var'})&&_(z,T)){var Y=!0,$=!1,G=void 0;try{for(var H,Q=z.node.declarations[Symbol.iterator]();!(Y=(H=Q.next()).done);Y=!0){var X=H.value;N.push(I.variableDeclarator(X.id))}}catch(J){$=!0,G=J}finally{try{!Y&&Q.return&&Q.return()}finally{if($)throw G}}}}});return 0>=N.length?[]:[I.variableDeclaration('var',N)]}function S(T,N){var O=N.replacement,D=N.scope,w=N.binding;if(D.getBinding(T.node.name)===w){if(D!==T.scope){var C=function(){if(I.isClass(O)||I.isFunction(O))return{v:void 0};var V=!1;if(B(O,{Function:function(U){V||(V=!0,U.stop())}},D),V)return{v:void 0}}();if('object'===('undefined'==typeof C?'undefined':d(C)))return C.v}return T.find(function(V){var M=V.node;return M===O})?void 0:(I.isExpression(O)||I.toExpression(O),T.replaceWith(O),!0)}}function v(T){T.isFunction()&&T.traverse({ReferencedIdentifier:function(O){var D=O.node,w=O.scope,C=w.getBinding(D.name);if(C&&C.path.isFunction()&&C.scope!==w&&C.constant){var V=C.referencePaths.indexOf(O);-1===V||(C.references--,C.referencePaths.splice(V,1),0===C.references&&(C.referenced=!1),1>=C.references&&C.scope.path.node&&(C.scope.path.node[R]=!0))}}})}function E(T){var N=T.get('id').node;if(N){var O=T.node,D=T.scope,w=D.getBinding(N.name);w.path.node===O&&w.referenced||(O.id=null)}}function k(T,N){return!!N.findParent(function(O){return O===T})}function _(T,N){return T.scope.getFunctionParent()===N.scope.getFunctionParent()}function q(T,N){function O(C,V){var M=C.get('label');if(null!==M.node){if(!_(V,C))return{break:!1,bail:!1};var U=void 0;U=V.scope.getLabel?W(M.node.name,V):V.scope.getBinding(M.node.name).path;var z=k(U,V);return{bail:z,break:z}}for(var Y=!0,$=!1,G=C.parentPath;G!==T.parentPath;){if(G.isLoop()||G.isSwitchCase()){$=!1,Y=!1;break}G.isIfStatement()&&($=!0),G=G.parentPath}return{break:$||Y,bail:$}}if(T.isBreakStatement())return O(T,N);var D=!1,w={break:!1,bail:!1};return T.traverse({BreakStatement:function(V){D||(w=O(V,N),(w.bail||w.break)&&(D=!0))}}),w}function P(T){return T.isFunctionDeclaration()||T.isVariableDeclaration({kind:'var'})}function W(T,N){var O=void 0,D=N;do if(O=D.scope.getLabel(T),O)return O;while(D=D.parentPath);return null}var I=m.types,B=m.traverse,F=o(20)(I),R=Symbol('shouldRevisit'),L=Symbol('markForRemoval'),A={ExpressionStatement:function(N){N.get('expression').isPure()&&F(N)},Function:{exit:function(N){if(this.optimizeRawSize){var O=N.node,D=N.scope,w=new Set,C=[],V=[],M=function(ee){var te=D.bindings[ee];if(!te.path.isVariableDeclarator())return'continue';var ne=te.path.parentPath;if(w.has(ne))return'continue';if(w.add(ne),ne.parentPath.isForInStatement())return'continue';if(ne.parentPath.parentPath.isFunction())return'continue';if(!ne.node||!ne.node.declarations)return'continue';var ae=[],re=!0,ie=!1,se=void 0;try{var oe=function(){var de=pe.value;C.push(de),de.init&&(ae.push(I.assignmentExpression('=',de.id,de.init)),V.push(function(){de.init=null}))};for(var pe,le=ne.node.declarations[Symbol.iterator]();!(re=(pe=le.next()).done);re=!0)oe()}catch(ue){ie=!0,se=ue}finally{try{!re&&le.return&&le.return()}finally{if(ie)throw se}}ae.length?V.push(function(){return ne.replaceWith(I.sequenceExpression(ae))}):V.push(function(){return F(ne)})};for(var U in D.bindings){var z=M(U);'continue'===z}if(C.length){V.forEach(function(Z){return Z()});var Y=!0,$=!1,G=void 0;try{for(var H,Q=O.body.body[Symbol.iterator]();!(Y=(H=Q.next()).done);Y=!0){var X=H.value;if(I.isVariableDeclaration(X)){var K;return void(K=X.declarations).push.apply(K,C)}}}catch(Z){$=!0,G=Z}finally{try{!Y&&Q.return&&Q.return()}finally{if($)throw G}}var J=I.variableDeclaration('var',C);O.body.body.unshift(J)}}}},Scope:{exit:function(N){N.node[R]&&(delete N.node[R],N.visit())},enter:function(N){var O=this;if(!N.isProgram()){var D=N.scope,w=N.isFunction()?N.get('params'):[];for(var C=w.length-1;0<=C;C--){var V=w[C];if(V.isIdentifier()){var M=D.bindings[V.node.name];if(M.referenced)break;M[L]=!0;continue}else if(V.isAssignmentPattern()){var U=V.get('left'),z=V.get('right');if(U.isIdentifier()&&z.isPure()){var Y=D.bindings[U.node.name];if(Y.referenced)break;Y[L]=!0;continue}}break}var $=function(X){var K=D.bindings[X];if(!K.referenced&&'module'!==K.kind){var J=function(){if('param'===K.kind&&(O.keepFnArgs||!K[L]))return{v:'continue'};if(!K.path.isVariableDeclarator()){if(!D.isPure(K.path.node))return{v:'continue'};if(K.path.isFunctionExpression()||K.path.isClassExpression())return{v:'continue'}}else if(K.path.parentPath.parentPath&&K.path.parentPath.parentPath.isForXStatement())return{v:'continue'};var te=[],ne=!1;if(K.constantViolations.forEach(function(ae){ne||ae===K.path||(!ae.parentPath.isExpressionStatement()&&(ne=!0),ae.isAssignmentExpression()&&!ae.get('right').isPure()?te.push(function(){return ae.replaceWith(ae.get('right'))}):te.push(function(){return F(ae)}))}),ne)return{v:'continue'};if(K.path.isVariableDeclarator()&&K.path.node.init&&!D.isPure(K.path.node.init)&&K.path.parentPath.node.declarations){if(1!==K.path.parentPath.node.declarations.length)return{v:'continue'};if(!K.path.get('id').isIdentifier())return{v:'continue'};K.path.parentPath.replaceWith(K.path.node.init)}else v(K.path,O),F(K.path);te.forEach(function(ae){return ae()}),D.removeBinding(X)}();if('object'===('undefined'==typeof J?'undefined':d(J)))return J.v}else if(K.constant){if(K.path.isFunctionDeclaration()||K.path.isVariableDeclarator()&&K.path.get('init').isFunction()){var Z=function(){var te=K.path.isFunctionDeclaration()?K.path:K.path.get('init'),ne=!0,ae=!0,re=!1,ie=void 0;try{for(var oe,se=K.referencePaths[Symbol.iterator]();!(ae=(oe=se.next()).done);ae=!0){var le=oe.value;if(!le.find(function(pe){return pe.node===te.node})){ne=!1;break}}}catch(pe){re=!0,ie=pe}finally{try{!ae&&se.return&&se.return()}finally{if(re)throw ie}}if(ne)return D.removeBinding(X),v(K.path,O),F(K.path),{v:'continue'}}();if('object'===('undefined'==typeof Z?'undefined':d(Z)))return Z.v}if(1===K.references&&'param'!==K.kind&&'module'!==K.kind&&K.constant){var ee=function(){var te=K.path.node,ne=K.path;if(I.isVariableDeclarator(te)){if(te=te.init,!ne.get('id').isIdentifier())return{v:'continue'};ne=ne.get('init')}if(!te)return{v:'continue'};if(!D.isPure(te,!0))return{v:'continue'};if(1<K.referencePaths.length)throw new Error('Expected only one reference');var ae=!1,re=K.referencePaths[0];if(ne.isIdentifier()?ae=re.scope.getBinding(te.name)!==D.getBinding(te.name):ne.traverse({Function:function(ce){ce.skip()},ReferencedIdentifier:function(ce){var he=ce.node;ae||(ae=re.scope.getBinding(he.name)!==D.getBinding(he.name))}}),ae)return{v:'continue'};var ie=K.path.parent;I.isVariableDeclaration(ie)&&(ie=K.path.parentPath.parent);var se=!1,oe=re.find(function(de){var ce=de.node;return se||(se=I.isWhileStatement(ce)||I.isFor(ce)||I.isFunction(ce)),ce===ie}),le=function(ce){return I.isFunction(ce)||I.isObjectExpression(ce)||I.isArrayExpression(ce)},pe=le(te)||h(te,le);if(!oe||pe&&se)return{v:'continue'};var ue=S(K.referencePaths[0],{binding:K,scope:D,replacement:te});ue&&(D.removeBinding(X),K.path.node&&F(K.path))}();if('object'===('undefined'==typeof ee?'undefined':d(ee)))return ee.v}}};for(var G in D.bindings){var Q=$(G);'continue'===Q}}}},BlockStatement:function(N){var O=N.get('body'),D=!1;for(var w=0;w<O.length;w++){var C=O[w];if(!D&&C.isCompletionStatement()){D=!0;continue}D&&!P(C)&&F(C)}},ReturnStatement:function(N){var O=N.node;if(N.inList){if(N.container.length-1!==N.key&&!P(N.getSibling(N.key+1))&&N.parentPath.isBlockStatement())return N.parentPath.pushContext(N.context),N.parentPath.visit(),void N.parentPath.popContext();if(!O.argument){for(var D=!0,w=N.parentPath;w&&!w.isFunction()&&D;){var C=w.getSibling(w.key+1);if(C.node)if(!C.isReturnStatement()){D=!1;break}else if(C.pushContext(N.context),C.visit(),C.popContext(),w.getSibling(w.key+1).node){D=!1;break}w=w.parentPath}D&&F(N)}}},ConditionalExpression:function(N){var O=N.node,D=N.get('test').evaluateTruthy();!0===D?N.replaceWith(O.consequent):!1===D&&N.replaceWith(O.alternate)},IfStatement:{exit:function(N){var O=N.get('consequent'),D=N.get('alternate'),w=N.get('test'),C=w.evaluateTruthy();if(!0===C)return void N.replaceWithMultiple([].concat(u(y(O)),u(x(D))));if(!1===C){if(D.node)return void N.replaceWithMultiple([].concat(u(y(D)),u(x(O))));N.replaceWithMultiple(x(O))}D.isBlockStatement()&&!D.node.body.length&&(D.remove(),N.node.alternate=null),O.isBlockStatement()&&!O.node.body.length&&D.isBlockStatement()&&D.node.body.length&&(O.replaceWith(D.node),D.remove(),N.node.alternate=null,w.replaceWith(I.unaryExpression('!',w.node,!0)))}},SwitchStatement:{exit:function(N){var D=N.get('discriminant').evaluate();if(D.confident){var w=D.value,C=N.get('cases'),V=-1,M=-1;for(var U=0;U<C.length;U++){var z=C[U].get('test');if(null===z.node){M=U;continue}var Y=z.evaluate();if(!Y.confident)return;if(Y.value===w){V=U;break}}var $=void 0;if(-1===V){if(-1===M)return N.skip(),void N.replaceWithMultiple(x(N));$=O(M)}else $=O(V);if(!$.bail){function ve(Ee){var ke={bail:!1,statements:[]};for(var qe=Ee;qe<C.length;qe++){var Pe=C[qe].get('consequent');for(var We=0;We<Pe.length;We++){var Ie=q(Pe[We],N);if(Ie.bail)return ke.bail=!0,ke;if(Ie.break)return ke;ke.statements.push(Pe[We].node)}}return ke}(function(Ee){var ke=!1;for(var qe=0;qe<Ee.length;qe++){if(I.isVariableDeclaration(Ee[qe],{kind:'let'})){ke=!0;break}if(I.isVariableDeclaration(Ee[qe],{kind:'const'})){ke=!0;break}}ke?N.replaceWith(I.BlockStatement(Ee)):N.replaceWithMultiple(Ee)})([].concat(u(x(N)),u($.statements)))}}}},WhileStatement:function(N){var O=N.get('test'),D=O.evaluate();D.confident&&!D.value&&N.remove()},ForStatement:function(N){var O=N.get('test'),D=O.evaluate();D.confident&&(D.value?O.remove():N.remove())},DoWhileStatement:function(N){var O=N.get('test'),D=O.evaluate();D.confident&&!D.value&&N.replaceWith(N.get('body').node)},AssignmentExpression:function(N){if(N.get('left').isIdentifier()&&N.parentPath.isExpressionStatement()){var O=N.parentPath.getSibling(N.parentPath.key-1);if(O&&O.isVariableDeclaration()){var D=O.node.declarations;1!==D.length||D[0].init||D[0].id.name!==N.get('left').node.name||(D[0].init=N.node.right,F(N))}}},'FunctionExpression|ClassExpression':function(N){this.keepFnName||E(N)},ForInStatement:function(N){var O=N.get('left');if(O.isIdentifier()){var D=N.scope.getBinding(O.node.name);!D||D.scope.getFunctionParent()!==N.scope.getFunctionParent()||!D.path.isVariableDeclarator()||D.path.parentPath.parentPath.isForInStatement({left:D.path.parent})||1<D.path.parent.declarations.length||D.path.node.init||(F(D.path),N.node.left=I.variableDeclaration('var',[I.variableDeclarator(O.node)]),D.path=N.get('left').get('declarations')[0])}}};return{name:'minify-dead-code-elimination',visitor:{Program:function(N){var O=1<arguments.length&&arguments[1]!==void 0?arguments[1]:{},D=O.opts;D=D===void 0?{}:D;var w=D.optimizeRawSize,C=w!==void 0&&w,V=D.keepFnName,M=V!==void 0&&V,U=D.keepFnArgs,z=U!==void 0&&U;N.traverse(A,{functionToBindings:new Map,optimizeRawSize:C,keepFnName:M,keepFnArgs:z})}}}}},function(r,s,o){'use strict';'use strict';r.exports=function(u){var d=u.types,h=o(1)(d);return{name:'minify-flip-comparisons',visitor:{BinaryExpression:function(y){var x=y.node,S=x.right,v=x.left;if(d.isLiteral(S)||h(S)||d.isUnaryExpression(S)&&d.isLiteral(S.argument)||d.isObjectExpression(S)||d.isArrayExpression(S)){if(0<=d.EQUALITY_BINARY_OPERATORS.indexOf(x.operator)||0<=['*','^','&','|'].indexOf(x.operator))return x.left=S,void(x.right=v);if(0<=d.BOOLEAN_NUMBER_BINARY_OPERATORS.indexOf(x.operator)){x.left=S,x.right=v;var E=void 0;switch(x.operator){case'>':E='<';break;case'<':E='>';break;case'>=':E='<=';break;case'<=':E='>=';}x.operator=E}}}}}}},function(r,s,o){'use strict';'use strict';r.exports=function(u){var d=u.types,h=o(0)(d);return{name:'minify-guarded-expressions',visitor:{LogicalExpression:{enter:[function(m){var y=m.node,x=m.get('left'),S=m.get('right'),v=!m.parentPath.isExpressionStatement();if('&&'===y.operator){var E=x.evaluateTruthy();!1===E?m.replaceWith(y.left):!0===E&&x.isPure()?m.replaceWith(y.right):!1===S.evaluateTruthy()&&S.isPure()&&!v&&m.replaceWith(y.left)}else if('||'===y.operator){var k=x.evaluateTruthy();!1===k&&x.isPure()?m.replaceWith(y.right):!0===k?m.replaceWith(y.left):!1===S.evaluateTruthy()&&S.isPure()&&!v&&m.replaceWith(y.left)}},function(m){var y=m.node;if(!h.hasSeen(y)&&(m.parentPath.isExpressionStatement()||m.parentPath.isSequenceExpression()&&m.parentPath.parentPath.isExpressionStatement())&&h.shouldFlip(y,1)){var x=h.flip(y,!0);m.replaceWith(x)}}]}}}}},function(r,s){'use strict';'use strict';r.exports=function(o){var u=o.types,d=u.binaryExpression('/',u.numericLiteral(1),u.numericLiteral(0));return{name:'minify-infinity',visitor:{Identifier:function(m){'Infinity'!==m.node.name||m.scope.getBinding('Infinity')||m.parentPath.isObjectProperty({key:m.node})||m.parentPath.isMemberExpression()||m.replaceWith(d)}}}}},function(r,s){'use strict';'use strict';function o(x,S){if(!(x instanceof S))throw new TypeError('Cannot call a class as a function')}function u(x){return x.isFunctionExpression()||x.isFunctionDeclaration()||x.isClassExpression()||x.isClassDeclaration()}function d(x){var S=x.node;return x.parentPath.isLabeledStatement({label:S})||x.parentPath.isBreakStatement({label:S})||x.parentPath.isContinueStatement({label:S})}var h=function(){function x(S,v){for(var E=0;E<v.length;E++){var k=v[E];k.enumerable=k.enumerable||!1,k.configurable=!0,'value'in k&&(k.writable=!0),Object.defineProperty(S,k.key,k)}}return function(S,v,E){return v&&x(S.prototype,v),E&&x(S,E),S}}();r.exports=function(x){var S=x.types,v=Object.prototype.hasOwnProperty,E=function(){function k(_,q){var P=2<arguments.length&&void 0!==arguments[2]?arguments[2]:{},W=P.blacklist,I=void 0===W?{}:W,B=P.keepFnName,F=void 0!==B&&B,R=P.eval,L=void 0!==R&&R;o(this,k),this.charset=_,this.program=q,this.blacklist=I,this.keepFnName=F,this.eval=L,this.unsafeScopes=new Set,this.visitedScopes=new Set,this.referencesToUpdate=new Map}return h(k,[{key:'run',value:function(){this.collect(),this.charset.sort(),this.mangle()}},{key:'isBlacklist',value:function(q){return v.call(this.blacklist,q)}},{key:'markUnsafeScopes',value:function(q){var P=q;do this.unsafeScopes.add(P);while(P=P.parent)}},{key:'collect',value:function(){var q=this,P={CallExpression:function(I){var B=I.get('callee');B.isIdentifier()&&'eval'===B.node.name&&!B.scope.getBinding('eval')&&q.markUnsafeScopes(I.scope)}};this.charset.shouldConsider&&(P.Identifier=function(I){var B=I.node;(I.parentPath.isMemberExpression({property:B})||I.parentPath.isObjectProperty({key:B}))&&q.charset.consider(B.name)},P.Literal=function(I){var B=I.node;q.charset.consider(B.value+'')}),this.program.traverse(P)}},{key:'mangle',value:function(){var q=this;this.program.traverse({Scopable:function(W){var B=W.scope;if((q.eval||!q.unsafeScopes.has(B))&&!q.visitedScopes.has(B)){function D(){return q.charset.getIdentifier(F++)}q.visitedScopes.add(B);var F=0,R=B.getAllBindings(),L=Object.keys(R);for(var A=0;A<L.length;A++){var T=L[A],N=R[T];if(!(N.renamed||'arguments'===T||q.program.scope.bindings[T]===N||!B.hasOwnBinding(T)||N.path.isLabeledStatement()||q.isBlacklist(T)||!!q.keepFnName&&u(N.path))){var O=void 0;do O=D();while(!S.isValidIdentifier(O)||v.call(R,O)||B.hasGlobal(O)||B.hasReference(O));q.rename(B,T,O),N.renamed=!0}}}}})}},{key:'rename',value:function(q,P,W){var I=q.getBinding(P);I.identifier.name=W;var B=q.bindings;B[W]=I,delete B[P];var F=I.constantViolations,R=function(C){if(F[C].isLabeledStatement())return'continue';var V=F[C].getBindingIdentifiers();Object.keys(V).map(function(M){V[M].name=W})};for(var L=0;L<F.length;L++){var A=R(L);'continue'===A}var T=I.referencePaths;for(var N=0;N<T.length;N++){var O=T[N],D=O.node;O.isIdentifier()?!d(O)&&(D.name=W):O.traverse({ReferencedIdentifier:function(C){C.node.name===P&&C.scope===q&&(C.node.name=W)}})}}}]),k}();return{name:'minify-mangle-names',visitor:{Program:function(_){var q=70000<_.getSource().length,P=new y(q),W=new E(P,_,this.opts);W.run()}}}};var m='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_'.split(''),y=function(){function x(S){var v=this;o(this,x),this.shouldConsider=S,this.chars=m.slice(),this.frequency={},this.chars.forEach(function(E){v.frequency[E]=0}),this.finalized=!1}return h(x,[{key:'consider',value:function(v){var E=this;this.shouldConsider&&v.split('').forEach(function(k){null!=E.frequency[k]&&E.frequency[k]++})}},{key:'sort',value:function(){var v=this;this.shouldConsider&&(this.chars=this.chars.sort(function(E,k){return v.frequency[k]-v.frequency[E]})),this.finalized=!0}},{key:'getIdentifier',value:function(v){if(!this.finalized)throw new Error('Should sort first');var E='';v++;do v--,E+=this.chars[v%this.chars.length],v=Math.floor(v/this.chars.length);while(0<v);return E}}]),x}()},function(r,s){'use strict';'use strict';r.exports=function(o){var u=o.types;return{name:'minify-numeric-literals',visitor:{NumericLiteral:function(h){if(h.node.extra){var m=h.node.value.toExponential().replace(/\+/g,'').replace(/e0/,'');if(h.node.extra.raw.length>m.length){var y=u.numericLiteral(h.node.value);y.extra={raw:m,rawValue:h.node.value},h.replaceWith(y)}}}}}}},function(r,s){'use strict';'use strict';r.exports=function(o){var u=o.types,d=Symbol('no member'),h={ReferencedIdentifier:function(y){var x=y,S=x.node,v=this.replacements[S.name];if(v){var E=void 0;if(y.parentPath.isMemberExpression({object:S})){var k=y.parent.property,_=u.isIdentifier(k)&&k.name;'string'==typeof _&&(E=v[_],y=y.parentPath)}E||(E=v[d]),E&&y.replaceWith(E.node)}}};return{name:'minify-replace',visitor:{Program:function(y){if(this.opts.replacements){var x=Object.create(null);this.opts.replacements.forEach(function(S){var v=S.identifierName,E=S.replacement,k=S.member;if(y.scope.globals[v]){if(!E.type.match(/literal|identifier/i))throw new Error('Only literals and identifier are supported as replacements');var _=u[E.type](E.value);if(x[v]||(x[v]={}),k&&x[v][k])throw new Error('Replacement collision '+v+'.'+k);x[v][k||d]={identifierName:v,node:_,member:k}}}),y.traverse(h,{replacements:x})}}}}}},function(r,s,o){'use strict';'use strict';function u(y){if(Array.isArray(y)){for(var x=0,S=Array(y.length);x<y.length;x++)S[x]=y[x];return S}return Array.from(y)}var d=function(){function y(x,S){var v=[],E=!0,k=!1,_=void 0;try{for(var P,q=x[Symbol.iterator]();!(E=(P=q.next()).done)&&(v.push(P.value),!(S&&v.length===S));E=!0);}catch(W){k=!0,_=W}finally{try{!E&&q['return']&&q['return']()}finally{if(k)throw _}}return v}return function(x,S){if(Array.isArray(x))return x;if(Symbol.iterator in Object(x))return y(x,S);throw new TypeError('Invalid attempt to destructure non-iterable instance')}}(),h='function'==typeof Symbol&&'symbol'==typeof Symbol.iterator?function(y){return typeof y}:function(y){return y&&'function'==typeof Symbol&&y.constructor===Symbol&&y!==Symbol.prototype?'symbol':typeof y},m=o(22);r.exports=function(y){function x(z){if(z.consequent&&z.alternate){var Y=z.test,$=!1;if(B.isBinaryExpression(Y)&&('!=='===Y.operator&&(Y.operator='===',$=!0),'!='===Y.operator&&(Y.operator='==',$=!0)),B.isUnaryExpression(Y,{operator:'!'})&&(z.test=Y.argument,$=!0),$){var G=z.consequent;z.consequent=z.alternate,z.alternate=G}}}function S(z,Y){return B.isFunction(Y)&&z===Y.body||B.isTryStatement(Y)||B.isCatchClause(Y)||B.isSwitchStatement(Y)||v(z)&&B.isIfStatement(Y)}function v(z){return B.isBlockStatement(z)&&1===z.body.length&&(B.isVariableDeclaration(z.body[0],{kind:'let'})||B.isVariableDeclaration(z.body[0],{kind:'const'})||B.isFunctionDeclaration(z.body[0]))}function E(z){return z===A||B.isUnaryExpression(z,{operator:'void'})&&B.isNumericLiteral(z.argument,{value:0})}function k(z){var Y=z.node;if(B.isBlockStatement(Y.body))for(var $=Y.body.body.length;0<=$;$--){var G=Y.body.body[$];B.isIfStatement(G)&&!G.alternate&&B.isReturnStatement(G.consequent)&&!G.consequent.argument&&q(z.get('body').get('body')[$])}}function _(z){var Y=z.node;if(B.isBlockStatement(Y.body)){for(var $=Y.body.body.length;0<=$;$--){var G=Y.body.body[$];B.isIfStatement(G)&&!G.alternate&&B.isContinueStatement(G.consequent)&&!G.consequent.label&&q(z.get('body').get('body')[$])}1===Y.body.body.length&&z.get('body').replaceWith(Y.body.body[0])}}function q(z){var Y=z.node,$=z.container.slice(z.key+1);if(!$.length)return void z.replaceWith(B.expressionStatement(Y.test));var G=Y.test;B.isBinaryExpression(G)&&'!=='===G.operator?G.operator='===':B.isBinaryExpression(G)&&'!='===G.operator?G.operator='==':B.isUnaryExpression(G,{operator:'!'})?Y.test=G.argument:Y.test=B.unaryExpression('!',Y.test,!0);for(var Q=$.length;0<Q--;)z.getSibling(z.key+1).remove();Y.consequent=1===$.length?$[0]:B.blockStatement($),z.visit()}function P(z){var Y=void 0;return'switch'===z?Y='discriminant':'throw'===z||'return'===z?Y='argument':'if'===z?Y='test':'for-in'===z?Y='right':void 0,function($){if($.inList){var G=$.node,Q=$.getSibling($.key-1);if(Q.isExpressionStatement()){var H=Q.node.expression;if(G[Y])B.isSequenceExpression(H)?H.expressions.push(G[Y]):H=B.sequenceExpression([H,G[Y]]);else if(B.isSequenceExpression(H)){var X=H.expressions[H.expressions.length-1];H.expressions[H.expressions.length-1]=B.unaryExpression('void',X,!0)}else H=B.unaryExpression('void',H,!0);H&&(G[Y]=H,Q.remove(),$.parentPath.parent&&($.parentPath.parent[O]=!0))}}}}function W(z,Y){if(Array.isArray(z)){for(var $=0;$<z.length;$++)if(W(z[$],Y))return!0;return!1}if(w(Y.node,z))return!0;var G=Y.evaluate();return G.confident&&Y.isPure()&&G.value===z}function I(z,Y){return!!Y.findParent(function($){return $===z})}var B=y.types,F=o(19)(B),R=o(0)(B),L=o(21)(B),A=B.unaryExpression('void',B.numericLiteral(0),!0),T=Symbol('condExprSeen'),N=Symbol('seqExprSeen'),O=Symbol('shouldRevisit'),D={};B.TYPES.forEach(function(z){D[z]=Symbol.for(z)});var w=function(Y,$){return!('symbol'!==('undefined'==typeof $?'undefined':h($)))&&B['is'+Symbol.keyFor($)](Y)},C=function(Y){return B.unaryExpression('!',Y)},V=function(Y){return C(C(Y))},M=function(Y,$){return B.logicalExpression('||',Y,$)},U=function(Y,$){return B.logicalExpression('&&',Y,$)};return{name:'minify-simplify',visitor:{Statement:{exit:function(Y){Y.node[O]&&(delete Y.node[O],Y.visit())}},UnaryExpression:{enter:[function(z){var Y=z.node;if(!('!'!==Y.operator||R.hasSeen(Y))){var $=Y.argument;if((B.isLogicalExpression($)||B.isConditionalExpression($)||B.isBinaryExpression($))&&!(B.isBinaryExpression($)&&-1===B.COMPARISON_BINARY_OPERATORS.indexOf($.operator))&&R.shouldFlip($,1)){var G=R.flip($);z.replaceWith(G)}}},function(z){var Y=z.node;if('!'===Y.operator&&B.isSequenceExpression(Y.argument)){var $=Y.argument.expressions,G=$[$.length-1];$[$.length-1]=B.unaryExpression('!',G,!0),z.replaceWith(Y.argument)}},function(z){var Y=z.node;if('!'===Y.operator&&B.isConditional(Y.argument)){var $=Y.argument;$.alternate=B.unaryExpression('!',$.alternate,!0),$.consequent=B.unaryExpression('!',$.consequent,!0),z.replaceWith(Y.argument)}}]},ConditionalExpression:{enter:[function(Y){var $=Y.node;if(!Y.get('test').isLogicalExpression())return void x($);if(R.shouldFlip($.test)){$.test=R.flip($.test);var G=[$.consequent,$.alternate];$.alternate=G[0],$.consequent=G[1]}},function(Y){var $=Y.get('test'),G=Y.get('consequent'),Q=Y.get('alternate'),H=D.Expression,X=D.LogicalExpression,K=new m([[X,!0,!1,function(Z){return Z}],[H,!0,!1,function(Z){return V(Z)}],[H,!1,!0,function(Z){return C(Z)}],[X,!0,H,function(Z,ee,te){return M(Z,te)}],[H,!0,H,function(Z,ee,te){return M(V(Z),te)}],[H,!1,H,function(Z,ee,te){return U(C(Z),te)}],[H,H,!0,function(Z,ee){return M(C(Z),ee)}],[X,H,!1,function(Z,ee){return U(Z,ee)}],[H,H,!1,function(Z,ee){return U(V(Z),ee)}]]),J=K.match([$,G,Q],W);J.match&&Y.replaceWith(J.value($.node,G.node,Q.node))}],exit:[function(z){function Y(X){if(X.isConditionalExpression()){var K=Y(X.get('consequent'));return!!K||(K=Y(X.get('alternate')),K)}if(null==Q)Q=X.node.operator;else if(X.node.operator!==Q)return!0;if(!X.isAssignmentExpression()||!(X.get('left').isIdentifier()||X.get('left').isMemberExpression()))return!0;var J=X.get('left').node;if(null==G)G=J;else if(!F(J,G))return!0;$.push(function(){return X.replaceWith(X.get('right').node)})}if(z.parentPath.isExpressionStatement()||z.parentPath.isSequenceExpression()){var $=[],G=null,Q=null,H=Y(z);H||($.forEach(function(X){return X()}),z.replaceWith(B.assignmentExpression(Q,G,z.node)))}},function(z){var Y=z.node;E(Y.consequent)&&E(Y.alternate)&&z.replaceWith(B.sequenceExpression([z.node.test,A]))},function(z){var Y=z.node;if(!Y[T]&&E(Y.consequent)){Y[T]=!0;var $=[Y.test],G=[],Q=void 0,H=function(ee){return ee.node[T]=!0,Q=ee.node.alternate,E(ee.node.consequent)?void($.push(ee.node.test),G.push(function(){return ee.remove()})):(Q=ee.node,'break')};for(var X=z.get('alternate');X.isConditionalExpression();X=X.get('alternate')){var K=H(X);if('break'===K)break}if(1!==$.length){var J=$.reduce(function(Z,ee){return B.logicalExpression('||',Z,ee)});z.replaceWith(B.conditionalExpression(J,A,Q))}}}]},VariableDeclaration:{enter:[function(z){var Y=z.node;if(!(2>Y.declarations.length)){var $=[],G=[],Q=!0,H=!1,X=void 0;try{for(var J,K=Y.declarations[Symbol.iterator]();!(Q=(J=K.next()).done);Q=!0){var Z=J.value;Z.init?$.push(Z):G.push(Z)}}catch(ee){H=!0,X=ee}finally{try{!Q&&K.return&&K.return()}finally{if(H)throw X}}Y.declarations=this.fitsInSlidingWindow?G.concat($):$.concat(G)}}]},Function:{enter:k,exit:function(Y){k(Y);Y.node[O]&&(delete Y.node[O],Y.visit())}},For:{enter:_,exit:_},ForStatement:{enter:function(Y){var $=Y.node;if(Y.inList&&(!$.init||B.isExpression($.init))){var G=Y.getSibling(Y.key-1),Q=!1;if(G.isVariableDeclaration()){var H=!1;if('let'===G.node.kind||'const'===G.node.kind){var X=Object.keys(G.getBindingIdentifiers());idloop:for(var K=0;K<X.length;K++){var J=G.scope.bindings[X[K]].referencePaths;for(var Z=0;Z<J.length;Z++)if(!I(Y,J[Z])){H=!0;break idloop}}}$.init||H||($.init=G.node,Q=!0)}else if(G.isExpressionStatement()){var ee=G.node.expression;$.init?B.isSequenceExpression(ee)?(ee.expressions.push($.init),$.init=ee):$.init=B.sequenceExpression([ee,$.init]):$.init=ee,Q=!0}Q&&G.remove()}},exit:function(Y){var $=Y.node;if($.test){if(!Y.get('body').isBlockStatement()){var G=Y.get('body').node;return B.isIfStatement(G)?B.isBreakStatement(G.consequent,{label:null})?($.test=B.logicalExpression('&&',$.test,B.unaryExpression('!',G.test,!0)),void($.body=G.alternate||B.emptyStatement())):B.isBreakStatement(G.alternate,{label:null})?($.test=B.logicalExpression('&&',$.test,G.test),void($.body=G.consequent||B.emptyStatement())):void 0:void 0}var Q=$.body.body,H=[],X=null,K=null,J=0;for(var Z;Z=Q[J];J++){if(B.isIfStatement(Z)){B.isBreakStatement(Z.consequent,{label:null})?(X=Z,K='consequent'):B.isBreakStatement(Z.alternate,{label:null})&&(X=Z,K='alternate');break}if(!B.isExpressionStatement(Z))return;H.push(Z.expression)}if(X){var ee=[];(K='consequent')?B.isBlockStatement(X.alternate)?ee.push.apply(ee,u(X.alternate.body)):X.alternate&&ee.push(X.alternate):B.isBlockStatement(X.consequent)?ee.push.apply(ee,u(X.consequent.body)):X.consequent&&ee.push(X.consequent),ee.push.apply(ee,u(Q.slice(J+1)));var te='consequent'===K?B.unaryExpression('!',X.test,!0):X.test,ne=void 0;1===H.length?ne=B.sequenceExpression([H[0],te]):H.length?(H.push(te),ne=B.sequenceExpression(H)):ne=te,$.test=B.logicalExpression('&&',$.test,ne),$.body=1===ee.length?ee[0]:ee.length?B.blockStatement(ee):B.emptyStatement()}}}},Program:function(Y){this.fitsInSlidingWindow=33000>Y.getSource().length/10;var $=Y.node,G=L($.body);G.length&&($.body=G)},BlockStatement:{enter:function(Y){var $=Y.node,G=Y.parent,Q=[],H=[];for(var X=0;X<$.body.length;X++){var K=$.body[X];B.isFunctionDeclaration(K)?Q.push(K):H.push(K)}var J=Q.concat(L(H));return J.length?1<J.length||S($,G)||$.directives?void($.body=J):void(J.length&&Y.replaceWith(J[0])):void 0},exit:function(Y){var $=Y.node,G=Y.parent;if(!S($,G)){if(1===$.body.length)return Y.get('body')[0].inList=!1,void Y.replaceWith($.body[0]);if(0===$.body.length)return void Y.replaceWith(B.emptyStatement());var Q=$.body;if(Q.length){var H=!0,X=!1,K=void 0;try{for(var Z,J=Q[Symbol.iterator]();!(H=(Z=J.next()).done);H=!0){var ee=Z.value;if(!B.isExpressionStatement(ee))return}}catch(te){X=!0,K=te}finally{try{!H&&J.return&&J.return()}finally{if(X)throw K}}Y.visit()}}}},ThrowStatement:P('throw'),ReturnStatement:{enter:[P('return'),function(z){var Y=z.node;return!z.parentPath.parentPath.isFunction()||z.getSibling(z.key+1).node?void 0:Y.argument?void(B.isUnaryExpression(Y.argument,{operator:'void'})&&z.replaceWith(Y.argument.argument)):void z.remove()}]},IfStatement:{exit:[function(z){var Y=z.node;!B.isIfStatement(Y.consequent)||Y.alternate||Y.consequent.alternate||(Y.test=B.logicalExpression('&&',Y.test,Y.consequent.test),Y.consequent=Y.consequent.consequent)},function(z){var Y=z.node;if(Y.consequent&&!Y.alternate&&'ExpressionStatement'===Y.consequent.type){var $='&&';return B.isUnaryExpression(Y.test,{operator:'!'})&&(Y.test=Y.test.argument,$='||'),void z.replaceWith(B.expressionStatement(B.logicalExpression($,Y.test,Y.consequent.expression)))}if(B.isExpressionStatement(Y.consequent)&&B.isExpressionStatement(Y.alternate))return void z.replaceWith(B.conditionalExpression(Y.test,Y.consequent.expression,Y.alternate.expression));if(!z.getSibling(z.key+1).node&&z.parentPath&&z.parentPath.parentPath&&z.parentPath.parentPath.isFunction()){if(B.isReturnStatement(Y.consequent)&&B.isReturnStatement(Y.alternate))return Y.consequent.argument||Y.altenrate.argument?void z.replaceWith(B.returnStatement(B.conditionalExpression(Y.test,Y.consequent.argument||A,Y.alternate.argument||A))):void z.replaceWith(B.expressionStatement(Y.test));if(B.isReturnStatement(Y.consequent)&&B.isExpressionStatement(Y.alternate))return Y.consequent.argument?void z.replaceWith(B.returnStatement(B.conditionalExpression(Y.test,Y.consequent.argument||A,B.unaryExpression('void',Y.alternate.expression,!0)))):void z.replaceWith(B.expressionStatement(B.logicalExpression('||',Y.test,Y.alternate.expression)));if(B.isReturnStatement(Y.alternate)&&B.isExpressionStatement(Y.consequent))return Y.alternate.argument?void z.replaceWith(B.returnStatement(B.conditionalExpression(Y.test,B.unaryExpression('void',Y.consequent.expression,!0),Y.alternate.argument||A))):void z.replaceWith(B.expressionStatement(B.logicalExpression('&&',Y.test,Y.consequent.expression)));if(B.isReturnStatement(Y.consequent)&&!Y.alternate){if(!Y.consequent.argument)return void z.replaceWith(B.expressionStatement(Y.test));if(z.getSibling(z.key-1).isIfStatement())return void z.replaceWith(B.returnStatement(B.conditionalExpression(Y.test,Y.consequent.argument||A,A)))}if(B.isReturnStatement(Y.alternate)&&!Y.consequent){if(!Y.alternate.argument)return void z.replaceWith(B.expressionStatement(Y.test));if(z.getSibling(z.key-1).isIfStatement())return void z.replaceWith(B.returnStatement(B.conditionalExpression(Y.test,Y.alternate.argument||A,A)))}}var G=z.getSibling(z.key+1);if(G.isIfStatement()&&(G.pushContext(z.context),G.visit(),G.popContext(),G=z.getSibling(z.key+1)),!!z.node){if(B.isReturnStatement(Y.consequent)&&!Y.alternate&&G.isReturnStatement()){var Q=G.node.argument||A;return G.remove(),void z.replaceWith(B.returnStatement(B.conditionalExpression(Y.test,Y.consequent.argument||A,Q)))}if(z.parentPath&&z.parentPath.parentPath&&z.parentPath.parentPath.isFunction()&&!z.getSibling(z.key+2).node&&B.isReturnStatement(Y.consequent)&&!Y.alternate&&G.isExpressionStatement()){var H=G.node.expression;return(G.remove(),Y.consequent.argument)?void z.replaceWith(B.returnStatement(B.conditionalExpression(Y.test,Y.consequent.argument,B.unaryExpression('void',H,!0)))):void z.replaceWith(B.logicalExpression('||',Y.test,H))}Y.consequent&&Y.alternate&&(B.isReturnStatement(Y.consequent)||B.isBlockStatement(Y.consequent)&&B.isReturnStatement(Y.consequent.body[Y.consequent.body.length-1]))&&(z.insertAfter(B.isBlockStatement(Y.alternate)?Y.alternate.body:Y.alternate),Y.alternate=null)}},function(z){var Y=z.node;if(Y.alternate&&B.isIfStatement(Y.consequent)&&!B.isIfStatement(Y.alternate)){Y.test=B.unaryExpression('!',Y.test,!0);var $=[Y.consequent,Y.alternate];Y.alternate=$[0],Y.consequent=$[1]}},function(z){var Y=z.node;if(z.inList&&z.get('consequent').isBlockStatement()&&!Y.alternate){var $=void 0,G=void 0,Q=[],H=Y.consequent.body;for(var K,X=0;K=H[X];X++)if(B.isExpressionStatement(K))Q.push(K.expression);else if(B.isIfStatement(K)){if(X<H.length-1)return;if(K.alternate)return;if(!B.isReturnStatement(K.consequent))return;$=K.consequent,G=K.test}else return;if(G&&$){Q.push(G);var J=1===Q.length?Q[0]:B.sequenceExpression(Q),Z=B.logicalExpression('&&',Y.test,J);z.replaceWith(B.ifStatement(Z,$,null))}}},P('if')]},WhileStatement:function(Y){var $=Y.node;Y.replaceWith(B.forStatement(null,$.test,null,$.body))},ForInStatement:P('for-in'),SequenceExpression:{exit:function(Y){function $(G){G[N]=!0;var Q=[],H=!0,X=!1,K=void 0;try{for(var Z,J=G.expressions[Symbol.iterator]();!(H=(Z=J.next()).done);H=!0){var ee=Z.value;B.isSequenceExpression(ee)?Q.push.apply(Q,u($(ee))):Q.push(ee)}}catch(te){X=!0,K=te}finally{try{!H&&J.return&&J.return()}finally{if(X)throw K}}return Q}Y.node[N]||(Y.node.expressions=$(Y.node))}},SwitchCase:function(Y){var $=Y.node;$.consequent.length&&($.consequent=L($.consequent))},SwitchStatement:{exit:[function(z){var Y=z.node;if(B.isIdentifier(Y.discriminant)&&Y.cases.length){var $=[],G=[],Q=void 0,H=!0,X=!1,K=void 0;try{for(var Z,J=Y.cases[Symbol.iterator]();!(H=(Z=J.next()).done);H=!0){var ee=Z.value;if(1<ee.consequent.length)return;var te=ee.consequent[0];if(!ee.test){if(!B.isReturnStatement(te))return;Q=te;continue}if(!ee.consequent.length){G.length?G.push(ee.test):G=[ee.test];continue}if(!B.isReturnStatement(te))return;var ne=B.binaryExpression('===',Y.discriminant,ee.test);G.length&&(ne=G.reduceRight(function(se,oe){return B.logicalExpression('||',B.binaryExpression('===',Y.discriminant,oe),se)},ne),G=[]),$.push([ne,te.argument||A])}}catch(se){X=!0,K=se}finally{try{!H&&J.return&&J.return()}finally{if(X)throw K}}if(!G.length){if(!Q)if(z.inList){var ae=z.getSibling(z.key+1);if(ae.isReturnStatement())Q=ae.node,ae.remove();else if(!ae.node&&z.parentPath.parentPath.isFunction())Q=B.returnStatement(A);else return}else return;var re=$.reduceRight(function(se,oe){var le=d(oe,2),pe=le[0],ue=le[1];return B.conditionalExpression(pe,ue,se)},Q.argument||A);if(z.replaceWith(B.returnStatement(re)),z.inList){var ie=z.getSibling(z.key-1);ie.isSwitchStatement()&&ie.visit()}}}},function(z){var Y=z.node;if(B.isIdentifier(Y.discriminant)&&Y.cases.length){var $=[],G=[],Q=void 0,H=!0,X=!1,K=void 0;try{for(var Z,J=Y.cases[Symbol.iterator]();!(H=(Z=J.next()).done);H=!0){var ee=Z.value;if(!ee.test){if(1!==ee.consequent.length)return;if(!B.isExpressionStatement(ee.consequent[0]))return;Q=ee.consequent[0].expression;continue}if(!ee.consequent.length){G.length?G.push(ee.test):G=[ee.test];continue}var te=d(ee.consequent,2),ne=te[0],ae=te[1];if(ee===Y.cases[Y.cases.length-1]){if(ae&&!B.isBreakStatement(ae))return;}else if(!B.isBreakStatement(ae))return;if(!B.isExpressionStatement(ne)||2<ee.consequent.length)return;var re=B.binaryExpression('===',Y.discriminant,ee.test);G.length&&(re=G.reduceRight(function(se,oe){return B.logicalExpression('||',B.binaryExpression('===',Y.discriminant,oe),se)},re),G=[]),$.push([re,ne.expression])}}catch(se){X=!0,K=se}finally{try{!H&&J.return&&J.return()}finally{if(X)throw K}}if(!G.length){var ie=$.reduceRight(function(se,oe){var le=d(oe,2),pe=le[0],ue=le[1];return B.conditionalExpression(pe,ue,se)},Q||A);z.replaceWith(ie)}}},function(z){var Y=z.node;if(Y.cases.length){var $=z.get('cases')[Y.cases.length-1];if($.node.consequent.length){var G=$.get('consequent')[$.node.consequent.length-1];B.isBreakStatement(G)&&G.remove()}}},P('switch')]}}}}},function(r,s,o){'use strict';'use strict';function u(h,m){function y(){m.isNewExpression()&&m.replaceWith(h.callExpression(x.callee,x.arguments))}var x=m.node,S=m.get('arguments');if(h.isIdentifier(x.callee,{name:'Array'})&&!m.scope.getBinding('Array')){if(0===S.length)m.replaceWith(h.arrayExpression([]));else if(1===S.length){var v=S[0],E=v.evaluate();E.confident?'number'==typeof E.value?0<=E.value&&6>=E.value&&0==E.value%1?m.replaceWith(h.arrayExpression(Array(E.value).fill(null))):y():m.replaceWith(h.arrayExpression([h.valueToNode(E.value)])):-1===['ArrayExpression','ObjectExpression','FunctionExpression','ArrowFunctionExpression','ClassExpression'].indexOf(v.node.type)?y():m.replaceWith(h.arrayExpression([v.node]))}else m.replaceWith(h.arrayExpression(x.arguments));return!0}}function d(h,m){var y=m.node;if(h.isIdentifier(y.callee,{name:'Object'})&&!m.scope.getBinding('Object')){var x=o(1)(h),S=y.arguments[0],v=S&&h.isIdentifier(S)&&m.scope.getBinding(S.name);return 0===y.arguments.length?m.replaceWith(h.objectExpression([])):'ArrayExpression'===S.type||h.isFunctionExpression(S)?m.replaceWith(S):x(S)||'undefined'===S.name||'NullLiteral'===S.type||'ObjectExpression'===S.type&&0===S.properties.length?m.replaceWith(h.objectExpression([])):v&&v.path.isFunction()?m.replaceWith(S):'ObjectExpression'===S.type?m.replaceWith(S):'NewExpression'===y.type&&m.replaceWith(h.callExpression(y.callee,y.arguments)),!0}}r.exports=function(h){var m=h.types;return{name:'minify-type-constructors',visitor:{CallExpression:function(x){var S=x.node;return m.isIdentifier(S.callee,{name:'Boolean'})&&1===S.arguments.length&&!x.scope.getBinding('Boolean')?void x.replaceWith(m.unaryExpression('!',m.unaryExpression('!',S.arguments[0],!0),!0)):m.isIdentifier(S.callee,{name:'Number'})&&1===S.arguments.length&&!x.scope.getBinding('Number')?void x.replaceWith(m.unaryExpression('+',S.arguments[0],!0)):m.isIdentifier(S.callee,{name:'String'})&&1===S.arguments.length&&!x.scope.getBinding('String')?void x.replaceWith(m.binaryExpression('+',S.arguments[0],m.stringLiteral(''))):void(u(m,x)||d(m,x))},NewExpression:function(x){u(m,x)||d(m,x)}}}}},function(r,s){'use strict';'use strict';s.__esModule=!0,s.default=function(o){var u=o.types;return{visitor:{MemberExpression:{exit:function(h){var m=h.node,y=m.property;m.computed&&u.isLiteral(y)&&u.isValidIdentifier(y.value)&&(m.property=u.identifier(y.value),m.computed=!1)}}}}},r.exports=s['default']},function(r,s){'use strict';'use strict';s.__esModule=!0,s.default=function(){return{visitor:{VariableDeclaration:function(u){if(u.inList)for(var d=u.node;!0;){var h=u.getSibling(u.key+1);if(!h.isVariableDeclaration({kind:d.kind}))break;d.declarations=d.declarations.concat(h.node.declarations),h.remove()}}}}},r.exports=s['default']},function(r,s){'use strict';'use strict';s.__esModule=!0,s.default=function(o){var u=o.types;return{visitor:{Literal:function(h){'boolean'==typeof h.node.value&&h.replaceWith(u.unaryExpression('!',u.numericLiteral(+!h.node.value),!0))}}}},r.exports=s['default']},function(r,s){'use strict';'use strict';s.__esModule=!0,s.default=function(o){var u=o.types;return{visitor:{ObjectProperty:{exit:function(h){var m=h.node,y=m.key;u.isLiteral(y)&&u.isValidIdentifier(y.value)&&(m.key=u.identifier(y.value),m.computed=!1)}}}}},r.exports=s['default']},function(r,s){'use strict';'use strict';r.exports=function(o){var u=o.types;return{name:'transform-regexp-constructors',visitor:{NewExpression:function(h){if(u.isIdentifier(h.node.callee,{name:'RegExp'})){var m=h.get('arguments').map(function(S){return S.evaluate()});if(m.every(function(S){return!0===S.confident&&'string'==typeof S.value})){var y=1<=m.length&&''!==m[0].value?m[0].value:'(?:)',x=2<=m.length?m[1].value:'';h.replaceWith(u.regExpLiteral(y,x))}}}}}}},function(r,s){'use strict';'use strict';s.__esModule=!0,s.default=function(){return{visitor:{BinaryExpression:function(u){var d=u.node,h=d.operator;if('==='===h||'!=='===h){var m=u.get('left'),y=u.get('right');m.baseTypeStrictlyMatches(y)&&(d.operator=d.operator.slice(0,-1))}}}}},r.exports=s['default']},function(r,s){'use strict';'use strict';s.__esModule=!0,s.default=function(o){var u=o.types;return{visitor:{ReferencedIdentifier:function(h){'undefined'===h.node.name&&h.replaceWith(u.unaryExpression('void',u.numericLiteral(0),!0))}}}},r.exports=s['default']},function(r,s){'use strict';'use strict';var o='function'==typeof Symbol&&'symbol'==typeof Symbol.iterator?function(u){return typeof u}:function(u){return u&&'function'==typeof Symbol&&u.constructor===Symbol?'symbol':typeof u};r.exports=function(u){function d(h,m){if('object'!==('undefined'==typeof h?'undefined':o(h))||'object'!==('undefined'==typeof h?'undefined':o(h))||null==h||null==m)return h===m;if(h.type!==m.type)return!1;var y=Object.keys(u.NODE_FIELDS[h.type]),x=!0,S=!1,v=void 0;try{for(var k,E=y[Symbol.iterator]();!(x=(k=E.next()).done);x=!0){var _=k.value;if(o(h[_])!==o(m[_]))return!1;if(Array.isArray(h[_])){if(!Array.isArray(m[_]))return!1;if(h[_].length!==m[_].length)return!1;for(var q=0;q<h[_].length;q++)if(!d(h[_][q],m[_][q]))return!1;continue}if(!d(h[_],m[_]))return!1}}catch(P){S=!0,v=P}finally{try{!x&&E.return&&E.return()}finally{if(S)throw v}}return!0}return d}},function(r,s){'use strict';'use strict';r.exports=function(o){return function(d){d.parentPath.isExpressionStatement({expression:d.node})&&(d=d.parentPath),d.isVariableDeclarator()&&d.parent.declarations[0]===d.node&&1===d.parent.declarations.length&&(d=d.parentPath),d.inList||'ForStatement'===d.scope.path.type?d.remove():d.replaceWith(o.emptyStatement())}}},function(r,s){'use strict';'use strict';var o='function'==typeof Symbol&&'symbol'==typeof Symbol.iterator?function(u){return typeof u}:function(u){return u&&'function'==typeof Symbol&&u.constructor===Symbol&&u!==Symbol.prototype?'symbol':typeof u};r.exports=function(u){return function(h){function m(k){var _=[],q=function(F){var R=function(){var C=void 0;return 1===_.length?C=_[0]:_.length&&(C=u.sequenceExpression(_)),{seq:C,bailed:!0,bailedAtIndex:F}},L=k[F];if(u.isExpression(L))_.push(L);else if(u.isExpressionStatement(L))_.push(L.expression);else if(u.isIfStatement(L)){var A=void 0;if(L.consequent){var T=m([L.consequent]);if(T.bailed)return{v:R()};A=T.seq}var N=void 0;if(L.alternate){var O=m([L.alternate]);if(O.bailed)return{v:R()};N=O.seq}N||A?N?A?_.push(u.conditionalExpression(L.test,A,N)):_.push(u.logicalExpression('||',L.test,N)):_.push(u.logicalExpression('&&',L.test,A)):_.push(L.test)}else if(u.isBlockStatement(L)){var D=m(L.body);if(D.bailed)return{v:R()};D.seq&&_.push(D.seq)}else return{v:R()}};for(var P=0;P<k.length;P++){var W=q(P);if('object'===('undefined'==typeof W?'undefined':o(W)))return W.v}var I=void 0;return 1===_.length?I=_[0]:_.length&&(I=u.sequenceExpression(_)),I=I,{seq:I}}var y=[],x=void 0;do{var S=m(h);x=S.bailed;var v=S.seq,E=S.bailedAtIndex;v&&y.push(u.expressionStatement(v)),x&&h[E]&&y.push(h[E]),x&&(h=h.slice(E+1),!h.length&&(x=!1))}while(x);return y}}},function(r,s){'use strict';'use strict';function o(h){return Array.isArray(h)?h:Array.from(h)}function u(h,m){if(!(h instanceof m))throw new TypeError('Cannot call a class as a function')}var d=function(){function h(m,y){for(var x=0;x<y.length;x++){var S=y[x];S.enumerable=S.enumerable||!1,S.configurable=!0,'value'in S&&(S.writable=!0),Object.defineProperty(m,S.key,S)}}return function(m,y,x){return y&&h(m.prototype,y),x&&h(m,x),m}}();r.exports=function(){function h(m){u(this,h),this.decisionTree=this.makeDecisionTree(m)}return d(h,[{key:'handle',value:function(y,x){var S=this.match(y,x);if(!S.match)throw new Error('No Match Found for '+y.toString());if('function'!=typeof S.value)throw new Error('Expecting a function. Instead got - '+S.value.toString());S.value.call(null,y,S.keys)}},{key:'match',value:function(y){var x=1>=arguments.length||void 0===arguments[1]?function(R,L){return R===L}:arguments[1],S=this.decisionTree,v={match:!1,value:void 0,keys:[]},E=Symbol('NO_MATCH');for(var k=0;k<y.length;k++){var _=E,q=!0,P=!1,W=void 0;try{for(var B,I=S.keys()[Symbol.iterator]();!(q=(B=I.next()).done);q=!0){var F=B.value;if(x(F,y[k])){_=F,v.keys.push(_);break}}}catch(R){P=!0,W=R}finally{try{!q&&I.return&&I.return()}finally{if(P)throw W}}if(_!==E&&(S=S.get(_),k===y.length-1)){v.match=!0,v.value=S;break}}return v}},{key:'makeDecisionTree',value:function(y){function x(W,I){if(2>I.length)throw new Error('at least 2 elements required in a pattern');if(2===I.length)return W.has(I[0])||W.set(I[0],I[1]),W;var B=o(I),F=B[0],R=B.slice(1);return W.has(F)?x(W.get(F),R):W.set(F,x(new Map,R)),W}var S=new Map,v=!0,E=!1,k=void 0;try{for(var q,_=y[Symbol.iterator]();!(v=(q=_.next()).done);v=!0){var P=q.value;x(S,P)}}catch(W){E=!0,k=W}finally{try{!v&&_.return&&_.return()}finally{if(E)throw k}}return S}}]),h}()},function(r,s,o){(function(u,d){function h(Yt,$t){for(var Gt=-1,Qt=Yt?Yt.length:0;++Gt<Qt;)if($t(Yt[Gt],Gt,Yt))return!0;return!1}function m(Yt){return function($t){return null==$t?void 0:$t[Yt]}}function y(Yt,$t){for(var Gt=-1,Qt=Array(Yt);++Gt<Yt;)Qt[Gt]=$t(Gt);return Qt}function x(Yt,$t){return null==Yt?void 0:Yt[$t]}function S(Yt){var $t=!1;if(null!=Yt&&'function'!=typeof Yt.toString)try{$t=!!(Yt+'')}catch(Gt){}return $t}function v(Yt){var $t=-1,Gt=Array(Yt.size);return Yt.forEach(function(Qt,Ht){Gt[++$t]=[Ht,Qt]}),Gt}function E(Yt){var $t=-1,Gt=Array(Yt.size);return Yt.forEach(function(Qt){Gt[++$t]=Qt}),Gt}function k(Yt){var $t=-1,Gt=Yt?Yt.length:0;for(this.clear();++$t<Gt;){var Qt=Yt[$t];this.set(Qt[0],Qt[1])}}function _(Yt){var $t=-1,Gt=Yt?Yt.length:0;for(this.clear();++$t<Gt;){var Qt=Yt[$t];this.set(Qt[0],Qt[1])}}function q(Yt){var $t=-1,Gt=Yt?Yt.length:0;for(this.clear();++$t<Gt;){var Qt=Yt[$t];this.set(Qt[0],Qt[1])}}function P(Yt){var $t=-1,Gt=Yt?Yt.length:0;for(this.__data__=new q;++$t<Gt;)this.add(Yt[$t])}function W(Yt){this.__data__=new _(Yt)}function I(Yt,$t){var Gt=Ut(Yt)||ue(Yt)?y(Yt.length,String):[],Qt=Gt.length;for(var Ht in Yt)($t||yt.call(Yt,Ht))&&(!Qt||'length'!=Ht&&!J(Ht,Qt))&&Gt.push(Ht);return Gt}function B(Yt,$t){for(var Gt=Yt.length;Gt--;)if(pe(Yt[Gt][0],$t))return Gt;return-1}function F(Yt,$t){$t=ee($t,Yt)?[$t]:z($t);for(var Gt=0,Qt=$t.length;null!=Yt&&Gt<Qt;)Yt=Yt[se($t[Gt++])];return Gt&&Gt==Qt?Yt:void 0}function R(Yt,$t){return null!=Yt&&$t in Object(Yt)}function L(Yt,$t,Gt,Qt,Ht){return!(Yt!==$t)||(null!=Yt&&null!=$t&&(fe(Yt)||me($t))?A(Yt,$t,L,Gt,Qt,Ht):Yt!==Yt&&$t!==$t)}function A(Yt,$t,Gt,Qt,Ht,Xt){var Kt=Ut(Yt),Jt=Ut($t),Zt=Re,en=Re;Kt||(Zt=Vt(Yt),Zt=Zt==Fe?De:Zt),Jt||(en=Vt($t),en=en==Fe?De:en);var tn=Zt==De&&!S(Yt),nn=en==De&&!S($t),an=Zt==en;if(an&&!tn)return Xt||(Xt=new W),Kt||zt(Yt)?Y(Yt,$t,Gt,Qt,Ht,Xt):$(Yt,$t,Zt,Gt,Qt,Ht,Xt);if(!(Ht&We)){var rn=tn&&yt.call(Yt,'__wrapped__'),sn=nn&&yt.call($t,'__wrapped__');if(rn||sn){var on=rn?Yt.value():Yt,ln=sn?$t.value():$t;return Xt||(Xt=new W),Gt(on,ln,Qt,Ht,Xt)}}return!!an&&(Xt||(Xt=new W),G(Yt,$t,Gt,Qt,Ht,Xt))}function T(Yt,$t,Gt,Qt){var Ht=Gt.length,Xt=Ht,Kt=!Qt;if(null==Yt)return!Xt;for(Yt=Object(Yt);Ht--;){var Jt=Gt[Ht];if(Kt&&Jt[2]?Jt[1]!==Yt[Jt[0]]:!(Jt[0]in Yt))return!1}for(;++Ht<Xt;){Jt=Gt[Ht];var Zt=Jt[0],en=Yt[Zt],tn=Jt[1];if(!(Kt&&Jt[2])){var nn=new W;if(Qt)var an=Qt(en,tn,Zt,Yt,$t,nn);if(void 0===an?!L(tn,en,Qt,Pe|We,nn):!an)return!1}else if(void 0===en&&!(Zt in Yt))return!1}return!0}function N(Yt){if(!fe(Yt)||ne(Yt))return!1;var $t=he(Yt)||S(Yt)?bt:Ze;return $t.test(oe(Yt))}function O(Yt){return'function'==typeof Yt?Yt:null==Yt?Ee:'object'==typeof Yt?Ut(Yt)?C(Yt[0],Yt[1]):w(Yt):ke(Yt)}function D(Yt){if(!ae(Yt))return _t(Yt);var $t=[];for(var Gt in Object(Yt))yt.call(Yt,Gt)&&'constructor'!=Gt&&$t.push(Gt);return $t}function w(Yt){var $t=H(Yt);return 1==$t.length&&$t[0][2]?ie($t[0][0],$t[0][1]):function(Gt){return Gt===Yt||T(Gt,Yt,$t)}}function C(Yt,$t){return ee(Yt)&&re($t)?ie(se(Yt),$t):function(Gt){var Qt=be(Gt,Yt);return Qt===void 0&&Qt===$t?Se(Gt,Yt):L($t,Qt,void 0,Pe|We)}}function V(Yt){return function($t){return F($t,Yt)}}function M(Yt,$t){var Gt;return wt(Yt,function(Qt,Ht,Xt){return Gt=$t(Qt,Ht,Xt),!Gt}),!!Gt}function U(Yt){if('string'==typeof Yt)return Yt;if(ye(Yt))return Dt?Dt.call(Yt):'';var $t=Yt+'';return'0'==$t&&1/Yt==-Ie?'-0':$t}function z(Yt){return Ut(Yt)?Yt:Mt(Yt)}function Y(Yt,$t,Gt,Qt,Ht,Xt){var Kt=Ht&We,Jt=Yt.length,Zt=$t.length;if(Jt!=Zt&&!(Kt&&Zt>Jt))return!1;var en=Xt.get(Yt);if(en&&Xt.get($t))return en==$t;var tn=-1,nn=!0,an=Ht&Pe?new P:void 0;for(Xt.set(Yt,$t),Xt.set($t,Yt);++tn<Jt;){var rn=Yt[tn],sn=$t[tn];if(Qt)var on=Kt?Qt(sn,rn,tn,$t,Yt,Xt):Qt(rn,sn,tn,Yt,$t,Xt);if(void 0!==on){if(on)continue;nn=!1;break}if(an){if(!h($t,function(ln,pn){if(!an.has(pn)&&(rn===ln||Gt(rn,ln,Qt,Ht,Xt)))return an.add(pn)})){nn=!1;break}}else if(!(rn===sn||Gt(rn,sn,Qt,Ht,Xt))){nn=!1;break}}return Xt['delete'](Yt),Xt['delete']($t),nn}function $(Yt,$t,Gt,Qt,Ht,Xt,Kt){switch(Gt){case $e:if(Yt.byteLength!=$t.byteLength||Yt.byteOffset!=$t.byteOffset)return!1;Yt=Yt.buffer,$t=$t.buffer;case Ye:return Yt.byteLength==$t.byteLength&&Qt(new vt(Yt),new vt($t));case je:case Le:case Oe:return pe(+Yt,+$t);case Ae:return Yt.name==$t.name&&Yt.message==$t.message;case Ce:case Me:return Yt==$t+'';case Ne:var Jt=v;case Ve:var Zt=Xt&We;if(Jt||(Jt=E),Yt.size!=$t.size&&!Zt)return!1;var en=Kt.get(Yt);if(en)return en==$t;Xt|=Pe,Kt.set(Yt,$t);var tn=Y(Jt(Yt),Jt($t),Qt,Ht,Xt,Kt);return Kt['delete'](Yt),tn;case Ue:if(Ot)return Ot.call(Yt)==Ot.call($t);}return!1}function G(Yt,$t,Gt,Qt,Ht,Xt){var Kt=Ht&We,Jt=ve(Yt),Zt=Jt.length,en=ve($t),tn=en.length;if(Zt!=tn&&!Kt)return!1;for(var nn=Zt;nn--;){var an=Jt[nn];if(Kt?!(an in $t):!yt.call($t,an))return!1}var rn=Xt.get(Yt);if(rn&&Xt.get($t))return rn==$t;var sn=!0;Xt.set(Yt,$t),Xt.set($t,Yt);for(var on=Kt;++nn<Zt;){an=Jt[nn];var ln=Yt[an],pn=$t[an];if(Qt)var un=Kt?Qt(pn,ln,an,$t,Yt,Xt):Qt(ln,pn,an,Yt,$t,Xt);if(void 0===un?!(ln===pn||Gt(ln,pn,Qt,Ht,Xt)):!un){sn=!1;break}on||(on='constructor'==an)}if(sn&&!on){var dn=Yt.constructor,cn=$t.constructor;dn!=cn&&'constructor'in Yt&&'constructor'in $t&&!('function'==typeof dn&&dn instanceof dn&&'function'==typeof cn&&cn instanceof cn)&&(sn=!1)}return Xt['delete'](Yt),Xt['delete']($t),sn}function Q(Yt,$t){var Gt=Yt.__data__;return te($t)?Gt['string'==typeof $t?'string':'hash']:Gt.map}function H(Yt){for(var $t=ve(Yt),Gt=$t.length;Gt--;){var Qt=$t[Gt],Ht=Yt[Qt];$t[Gt]=[Qt,Ht,re(Ht)]}return $t}function X(Yt,$t){var Gt=x(Yt,$t);return N(Gt)?Gt:void 0}function K(Yt,$t,Gt){$t=ee($t,Yt)?[$t]:z($t);for(var Qt,Ht=-1,Xt=$t.length;++Ht<Xt;){var Kt=se($t[Ht]);if(!(Qt=null!=Yt&&Gt(Yt,Kt)))break;Yt=Yt[Kt]}if(Qt)return Qt;var Xt=Yt?Yt.length:0;return!!Xt&&ge(Xt)&&J(Kt,Xt)&&(Ut(Yt)||ue(Yt))}function J(Yt,$t){return $t=null==$t?Be:$t,!!$t&&('number'==typeof Yt||et.test(Yt))&&-1<Yt&&0==Yt%1&&Yt<$t}function Z(Yt,$t,Gt){if(!fe(Gt))return!1;var Qt=typeof $t;return!('number'==Qt?!(de(Gt)&&J($t,Gt.length)):!('string'==Qt&&$t in Gt))&&pe(Gt[$t],Yt)}function ee(Yt,$t){if(Ut(Yt))return!1;var Gt=typeof Yt;return'number'==Gt||'symbol'==Gt||'boolean'==Gt||null==Yt||ye(Yt)||Qe.test(Yt)||!Ge.test(Yt)||null!=$t&&Yt in Object($t)}function te(Yt){var $t=typeof Yt;return'string'==$t||'number'==$t||'symbol'==$t||'boolean'==$t?'__proto__'!==Yt:null===Yt}function ne(Yt){return!!ft&&ft in Yt}function ae(Yt){var $t=Yt&&Yt.constructor,Gt='function'==typeof $t&&$t.prototype||ht;return Yt===Gt}function re(Yt){return Yt===Yt&&!fe(Yt)}function ie(Yt,$t){return function(Gt){return null!=Gt&&Gt[Yt]===$t&&($t!==void 0||Yt in Object(Gt))}}function se(Yt){if('string'==typeof Yt||ye(Yt))return Yt;var $t=Yt+'';return'0'==$t&&1/Yt==-Ie?'-0':$t}function oe(Yt){if(null!=Yt){try{return mt.call(Yt)}catch($t){}try{return Yt+''}catch($t){}}return''}function le(Yt,$t){if('function'!=typeof Yt||$t&&'function'!=typeof $t)throw new TypeError('Expected a function');var Gt=function(){var Qt=arguments,Ht=$t?$t.apply(this,Qt):Qt[0],Xt=Gt.cache;if(Xt.has(Ht))return Xt.get(Ht);var Kt=Yt.apply(this,Qt);return Gt.cache=Xt.set(Ht,Kt),Kt};return Gt.cache=new(le.Cache||q),Gt}function pe(Yt,$t){return Yt===$t||Yt!==Yt&&$t!==$t}function ue(Yt){return ce(Yt)&&yt.call(Yt,'callee')&&(!Et.call(Yt,'callee')||xt.call(Yt)==Fe)}function de(Yt){return null!=Yt&&ge(Yt.length)&&!he(Yt)}function ce(Yt){return me(Yt)&&de(Yt)}function he(Yt){var $t=fe(Yt)?xt.call(Yt):'';return $t==Te||'[object GeneratorFunction]'==$t}function ge(Yt){return'number'==typeof Yt&&-1<Yt&&0==Yt%1&&Yt<=Be}function fe(Yt){var $t=typeof Yt;return!!Yt&&('object'==$t||'function'==$t)}function me(Yt){return!!Yt&&'object'==typeof Yt}function ye(Yt){return'symbol'==typeof Yt||me(Yt)&&xt.call(Yt)==Ue}function xe(Yt){return null==Yt?'':U(Yt)}function be(Yt,$t,Gt){var Qt=null==Yt?void 0:F(Yt,$t);return Qt===void 0?Gt:Qt}function Se(Yt,$t){return null!=Yt&&K(Yt,$t,R)}function ve(Yt){return de(Yt)?I(Yt):D(Yt)}function Ee(Yt){return Yt}function ke(Yt){return ee(Yt)?m(se(Yt)):V(Yt)}var qe='__lodash_hash_undefined__',Pe=1,We=2,Ie=1/0,Be=9007199254740991,Fe='[object Arguments]',Re='[object Array]',je='[object Boolean]',Le='[object Date]',Ae='[object Error]',Te='[object Function]',Ne='[object Map]',Oe='[object Number]',De='[object Object]',we='[object Promise]',Ce='[object RegExp]',Ve='[object Set]',Me='[object String]',Ue='[object Symbol]',ze='[object WeakMap]',Ye='[object ArrayBuffer]',$e='[object DataView]',Ge=/\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,Qe=/^\w*$/,He=/^\./,Xe=/[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g,Ke=/[\\^$.*+?()[\]{}|]/g,Je=/\\(\\)?/g,Ze=/^\[object .+?Constructor\]$/,et=/^(?:0|[1-9]\d*)$/,tt={};tt['[object Float32Array]']=tt['[object Float64Array]']=tt['[object Int8Array]']=tt['[object Int16Array]']=tt['[object Int32Array]']=tt['[object Uint8Array]']=tt['[object Uint8ClampedArray]']=tt['[object Uint16Array]']=tt['[object Uint32Array]']=!0,tt[Fe]=tt[Re]=tt[Ye]=tt[je]=tt[$e]=tt[Le]=tt[Ae]=tt[Te]=tt[Ne]=tt[Oe]=tt[De]=tt[Ce]=tt[Ve]=tt[Me]=tt[ze]=!1;var nt='object'==typeof u&&u&&u.Object===Object&&u,at='object'==typeof self&&self&&self.Object===Object&&self,rt=nt||at||Function('return this')(),it='object'==typeof s&&s&&!s.nodeType&&s,st=it&&'object'==typeof d&&d&&!d.nodeType&&d,ot=st&&st.exports===it,lt=ot&&nt.process,pt=function(){try{return lt&&lt.binding('util')}catch(Yt){}}(),ut=pt&&pt.isTypedArray,dt=Array.prototype,ct=Function.prototype,ht=Object.prototype,gt=rt['__core-js_shared__'],ft=function(){var Yt=/[^.]+$/.exec(gt&&gt.keys&&gt.keys.IE_PROTO||'');return Yt?'Symbol(src)_1.'+Yt:''}(),mt=ct.toString,yt=ht.hasOwnProperty,xt=ht.toString,bt=RegExp('^'+mt.call(yt).replace(Ke,'\\$&').replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g,'$1.*?')+'$'),St=rt.Symbol,vt=rt.Uint8Array,Et=ht.propertyIsEnumerable,kt=dt.splice,_t=function($t,Gt){return function(Qt){return $t(Gt(Qt))}}(Object.keys,Object),qt=X(rt,'DataView'),Pt=X(rt,'Map'),Wt=X(rt,'Promise'),It=X(rt,'Set'),Bt=X(rt,'WeakMap'),Ft=X(Object,'create'),Rt=oe(qt),jt=oe(Pt),Lt=oe(Wt),At=oe(It),Tt=oe(Bt),Nt=St?St.prototype:void 0,Ot=Nt?Nt.valueOf:void 0,Dt=Nt?Nt.toString:void 0;k.prototype.clear=function(){this.__data__=Ft?Ft(null):{}},k.prototype['delete']=function($t){return this.has($t)&&delete this.__data__[$t]},k.prototype.get=function($t){var Gt=this.__data__;if(Ft){var Qt=Gt[$t];return Qt===qe?void 0:Qt}return yt.call(Gt,$t)?Gt[$t]:void 0},k.prototype.has=function($t){var Gt=this.__data__;return Ft?Gt[$t]!==void 0:yt.call(Gt,$t)},k.prototype.set=function($t,Gt){var Qt=this.__data__;return Qt[$t]=Ft&&void 0===Gt?qe:Gt,this},_.prototype.clear=function(){this.__data__=[]},_.prototype['delete']=function($t){var Gt=this.__data__,Qt=B(Gt,$t);if(0>Qt)return!1;var Ht=Gt.length-1;return Qt==Ht?Gt.pop():kt.call(Gt,Qt,1),!0},_.prototype.get=function($t){var Gt=this.__data__,Qt=B(Gt,$t);return 0>Qt?void 0:Gt[Qt][1]},_.prototype.has=function($t){return-1<B(this.__data__,$t)},_.prototype.set=function($t,Gt){var Qt=this.__data__,Ht=B(Qt,$t);return 0>Ht?Qt.push([$t,Gt]):Qt[Ht][1]=Gt,this},q.prototype.clear=function(){this.__data__={hash:new k,map:new(Pt||_),string:new k}},q.prototype['delete']=function($t){return Q(this,$t)['delete']($t)},q.prototype.get=function($t){return Q(this,$t).get($t)},q.prototype.has=function($t){return Q(this,$t).has($t)},q.prototype.set=function($t,Gt){return Q(this,$t).set($t,Gt),this},P.prototype.add=P.prototype.push=function($t){return this.__data__.set($t,qe),this},P.prototype.has=function($t){return this.__data__.has($t)},W.prototype.clear=function(){this.__data__=new _},W.prototype['delete']=function($t){return this.__data__['delete']($t)},W.prototype.get=function($t){return this.__data__.get($t)},W.prototype.has=function($t){return this.__data__.has($t)},W.prototype.set=function($t,Gt){var Qt=this.__data__;if(Qt instanceof _){var Ht=Qt.__data__;if(!Pt||199>Ht.length)return Ht.push([$t,Gt]),this;Qt=this.__data__=new q(Ht)}return Qt.set($t,Gt),this};var wt=function($t,Gt){return function(Qt,Ht){if(null==Qt)return Qt;if(!de(Qt))return $t(Qt,Ht);for(var Xt=Qt.length,Kt=Gt?Xt:-1,Jt=Object(Qt);(Gt?Kt--:++Kt<Xt)&&!(!1===Ht(Jt[Kt],Kt,Jt)););return Qt}}(function($t,Gt){return $t&&Ct($t,Gt,ve)}),Ct=function($t){return function(Gt,Qt,Ht){for(var Xt=-1,Kt=Object(Gt),Jt=Ht(Gt),Zt=Jt.length;Zt--;){var en=Jt[$t?Zt:++Xt];if(!1===Qt(Kt[en],en,Kt))break}return Gt}}(),Vt=function($t){return xt.call($t)};(qt&&Vt(new qt(new ArrayBuffer(1)))!=$e||Pt&&Vt(new Pt)!=Ne||Wt&&Vt(Wt.resolve())!=we||It&&Vt(new It)!=Ve||Bt&&Vt(new Bt)!=ze)&&(Vt=function(Yt){var $t=xt.call(Yt),Gt=$t==De?Yt.constructor:void 0,Qt=Gt?oe(Gt):void 0;if(Qt)switch(Qt){case Rt:return $e;case jt:return Ne;case Lt:return we;case At:return Ve;case Tt:return ze;}return $t});var Mt=le(function(Yt){Yt=xe(Yt);var $t=[];return He.test(Yt)&&$t.push(''),Yt.replace(Xe,function(Gt,Qt,Ht,Xt){$t.push(Ht?Xt.replace(Je,'$1'):Qt||Gt)}),$t});le.Cache=q;var Ut=Array.isArray,zt=ut?function($t){return function(Gt){return $t(Gt)}}(ut):function($t){return me($t)&&ge($t.length)&&!!tt[xt.call($t)]};d.exports=function($t,Gt,Qt){var Ht=Ut($t)?h:M;return Qt&&Z($t,Gt,Qt)&&(Gt=void 0),Ht($t,O(Gt,3))}}).call(s,o(24),o(25)(r))},function(r,s){var o=function(){return this}();try{o=o||Function('return this')()||(1,eval)('this')}catch(u){'object'==typeof window&&(o=window)}r.exports=o},function(r,s){r.exports=function(o){return o.webpackPolyfill||(o.deprecate=function(){},o.paths=[],!o.children&&(o.children=[]),Object.defineProperty(o,'loaded',{enumerable:!0,configurable:!1,get:function(){return o.l}}),Object.defineProperty(o,'id',{enumerable:!0,configurable:!1,get:function(){return o.i}}),o.webpackPolyfill=1),o}},function(r,s,o){'use strict';'use strict';r.exports={minified:!0,plugins:[o(2),o(3),o(4),o(5),o(6),o(7),o(8),o(9),o(10),o(11),o(12),o(13),o(14),o(15),o(16),o(17),o(18)]}}]);
+var BabiliPreset =
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+
+/******/ 	// identity function for calling harmory imports with the correct context
+/******/ 	__webpack_require__.i = function(value) { return value; };
+
+/******/ 	// define getter function for harmory exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		Object.defineProperty(exports, name, {
+/******/ 			configurable: false,
+/******/ 			enumerable: true,
+/******/ 			get: getter
+/******/ 		});
+/******/ 	};
+
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 44);
+/******/ })
+/************************************************************************/
+/******/ ((function(modules) {
+	// Check all modules for deduplicated modules
+	for(var i in modules) {
+		if(Object.prototype.hasOwnProperty.call(modules, i)) {
+			switch(typeof modules[i]) {
+			case "function": break;
+			case "object":
+				// Module can be created from a template
+				modules[i] = (function(_m) {
+					var args = _m.slice(1), fn = modules[_m[0]];
+					return function (a,b,c) {
+						fn.apply(this, [a,b,c].concat(args));
+					};
+				}(modules[i]));
+				break;
+			default:
+				// Module is a copy of another module
+				modules[i] = modules[modules[i]];
+				break;
+			}
+		}
+	}
+	return modules;
+}([
+/* 0 */
+/***/ function(module, exports) {
+
+"use strict";
+"use strict";
+
+var flipSeen = Symbol("flipSeen");
+
+module.exports = function (t) {
+  return {
+    hasSeen: function hasSeen(node) {
+      return !!node[flipSeen];
+    },
+
+
+    // Takes an expressions and determines if it has
+    // more nodes that could benifit from flipping than not.
+    shouldFlip: function shouldFlip(topNode) {
+      var savings = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+
+      visit(topNode);
+      return savings > 0;
+
+      function visit(node) {
+        if (t.isUnaryExpression(node, { operator: "!" })) {
+          savings++;
+          return;
+        }
+
+        if (t.isLogicalExpression(node)) {
+          visit(node.left);
+          visit(node.right);
+          return;
+        }
+
+        if (!(t.isBinaryExpression(node) && t.EQUALITY_BINARY_OPERATORS.indexOf(node.operator) > -1)) {
+          // Binary expressions wouldn't hurut because we know how to flip them
+          savings--;
+        }
+      }
+    },
+    flip: function flip(node, resultNotUsed) {
+      var lastNodeDesc = void 0;
+      var ret = visit(node);
+
+      ret[flipSeen] = true;
+
+      if (resultNotUsed && lastNodeDesc) {
+        var _lastNodeDesc = lastNodeDesc;
+        var parent = _lastNodeDesc.parent;
+        var key = _lastNodeDesc.key;
+
+        if (parent && key && t.isUnaryExpression(parent[key], { operator: "!" })) {
+          parent[key] = parent[key].argument;
+        }
+      }
+
+      return ret;
+
+      function visit(node, parent, key) {
+        lastNodeDesc = { parent: parent, key: key };
+
+        if (t.isUnaryExpression(node, { operator: "!" })) {
+          return node.argument;
+        }
+
+        if (t.isLogicalExpression(node)) {
+          node.operator = node.operator === "&&" ? "||" : "&&";
+          node.left = visit(node.left, node, "left");
+          node.right = visit(node.right, node, "right");
+          return node;
+        }
+
+        if (t.isBinaryExpression(node)) {
+          var operator = void 0;
+          switch (node.operator) {
+            case "!==":
+              operator = "===";break;
+            case "===":
+              operator = "!==";break;
+            case "!=":
+              operator = "==";break;
+            case "==":
+              operator = "!=";break;
+          }
+
+          if (operator) {
+            node.operator = operator;
+            return node;
+          }
+
+          // Falls through to unary expression
+        }
+
+        return t.unaryExpression("!", node, true);
+      }
+    }
+  };
+};
+
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
+"use strict";
+"use strict";
+
+module.exports = function (t) {
+  return function isVoid0(expr) {
+    return t.isUnaryExpression(expr, { operator: "void" }) && t.isNumericLiteral(expr.argument, { value: 0 });
+  };
+};
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(24);
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(25);
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(28);
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(30);
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(32);
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(33);
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(34);
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(35);
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(36);
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(41);
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+"use strict";
+/*istanbul ignore next*/"use strict";
+
+exports.__esModule = true;
+
+exports.default = function ( /*istanbul ignore next*/_ref) {
+  /*istanbul ignore next*/var t = _ref.types;
+
+  return {
+    visitor: {
+      MemberExpression: { /*istanbul ignore next*/
+        exit: function exit(_ref2) {
+          /*istanbul ignore next*/var node = _ref2.node;
+
+          var prop = node.property;
+          if (node.computed && t.isLiteral(prop) && t.isValidIdentifier(prop.value)) {
+            // foo["bar"] => foo.bar
+            node.property = t.identifier(prop.value);
+            node.computed = false;
+          }
+        }
+      }
+    }
+  };
+};
+
+/*istanbul ignore next*/module.exports = exports["default"];
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+"use strict";
+/*istanbul ignore next*/"use strict";
+
+exports.__esModule = true;
+
+exports.default = function () {
+  return {
+    visitor: { /*istanbul ignore next*/
+      VariableDeclaration: function VariableDeclaration(path) {
+        if (!path.inList) return;
+
+        /*istanbul ignore next*/var node = path.node;
+
+
+        while (true) {
+          var sibling = path.getSibling(path.key + 1);
+          if (!sibling.isVariableDeclaration({ kind: node.kind })) break;
+
+          node.declarations = node.declarations.concat(sibling.node.declarations);
+          sibling.remove();
+        }
+      }
+    }
+  };
+};
+
+/*istanbul ignore next*/module.exports = exports["default"];
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+"use strict";
+/*istanbul ignore next*/"use strict";
+
+exports.__esModule = true;
+
+exports.default = function ( /*istanbul ignore next*/_ref) {
+  /*istanbul ignore next*/var t = _ref.types;
+
+  return {
+    visitor: { /*istanbul ignore next*/
+      Literal: function Literal(path) {
+        if (typeof path.node.value === "boolean") {
+          path.replaceWith(t.unaryExpression("!", t.numericLiteral(+!path.node.value), true));
+        }
+      }
+    }
+  };
+};
+
+/*istanbul ignore next*/module.exports = exports["default"];
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+"use strict";
+/*istanbul ignore next*/"use strict";
+
+exports.__esModule = true;
+
+exports.default = function ( /*istanbul ignore next*/_ref) {
+  /*istanbul ignore next*/var t = _ref.types;
+
+  return {
+    visitor: {
+      ObjectProperty: { /*istanbul ignore next*/
+        exit: function exit(_ref2) {
+          /*istanbul ignore next*/var node = _ref2.node;
+
+          var key = node.key;
+          if (t.isLiteral(key) && t.isValidIdentifier(key.value)) {
+            // "foo": "bar" -> foo: "bar"
+            node.key = t.identifier(key.value);
+            node.computed = false;
+          }
+        }
+      }
+    }
+  };
+};
+
+/*istanbul ignore next*/module.exports = exports["default"];
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(43);
+
+
+/***/ },
+/* 17 */
+/***/ function(module, exports) {
+
+"use strict";
+/*istanbul ignore next*/"use strict";
+
+exports.__esModule = true;
+
+exports.default = function () {
+  return {
+    visitor: { /*istanbul ignore next*/
+      BinaryExpression: function BinaryExpression(path) {
+        /*istanbul ignore next*/var node = path.node;
+
+
+        var op = node.operator;
+        if (op !== "===" && op !== "!==") return;
+
+        var left = path.get("left");
+        var right = path.get("right");
+        if (left.baseTypeStrictlyMatches(right)) {
+          node.operator = node.operator.slice(0, -1);
+        }
+      }
+    }
+  };
+};
+
+/*istanbul ignore next*/module.exports = exports["default"];
+
+/***/ },
+/* 18 */
+/***/ function(module, exports) {
+
+"use strict";
+/*istanbul ignore next*/"use strict";
+
+exports.__esModule = true;
+
+exports.default = function ( /*istanbul ignore next*/_ref) {
+  /*istanbul ignore next*/var t = _ref.types;
+
+  return {
+    visitor: { /*istanbul ignore next*/
+      ReferencedIdentifier: function ReferencedIdentifier(path) {
+        if (path.node.name === "undefined") {
+          path.replaceWith(t.unaryExpression("void", t.numericLiteral(0), true));
+        }
+      }
+    }
+  };
+};
+
+/*istanbul ignore next*/module.exports = exports["default"];
+
+/***/ },
+/* 19 */
+/***/ function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() { return this; })();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ },
+/* 20 */
+/***/ function(module, exports) {
+
+module.exports = function(module) {
+	if(!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			configurable: false,
+			get: function() { return module.l; }
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			configurable: false,
+			get: function() { return module.i; }
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+}
+
+
+/***/ },
+/* 21 */
+/***/ function(module, exports) {
+
+"use strict";
+"use strict";
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+module.exports = function (t) {
+  function equiv(a, b) {
+    if ((typeof a === "undefined" ? "undefined" : _typeof(a)) !== "object" || (typeof a === "undefined" ? "undefined" : _typeof(a)) !== "object" || a == null || b == null) {
+      return a === b;
+    }
+
+    if (a.type !== b.type) {
+      return false;
+    }
+
+    var fields = Object.keys(t.NODE_FIELDS[a.type]);
+
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = fields[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var field = _step.value;
+
+        if (_typeof(a[field]) !== _typeof(b[field])) {
+          return false;
+        }
+
+        if (Array.isArray(a[field])) {
+          if (!Array.isArray(b[field])) {
+            return false;
+          }
+          if (a[field].length !== b[field].length) {
+            return false;
+          }
+
+          for (var i = 0; i < a[field].length; i++) {
+            if (!equiv(a[field][i], b[field][i])) {
+              return false;
+            }
+          }
+          continue;
+        }
+
+        if (!equiv(a[field], b[field])) {
+          return false;
+        }
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  return equiv;
+};
+
+/***/ },
+/* 22 */
+/***/ function(module, exports) {
+
+"use strict";
+"use strict";
+
+module.exports = function (t) {
+  // If we can't remove the expression we'll just replace it with an empty statement.
+  function removeOrVoid(path) {
+    // If we are working with the expression of an expression statement we want to deal
+    // with the expression statement instead.
+    if (path.parentPath.isExpressionStatement({ expression: path.node })) {
+      path = path.parentPath;
+    }
+
+    // If we are working with a variable declarator and there is only one then
+    // we need to look at the parent.
+    if (path.isVariableDeclarator() && path.parent.declarations[0] === path.node && path.parent.declarations.length === 1) {
+      path = path.parentPath;
+    }
+
+    if (!path.inList && path.scope.path.type !== "ForStatement") {
+      path.replaceWith(t.emptyStatement());
+    } else {
+      path.remove();
+    }
+  }
+
+  return removeOrVoid;
+};
+
+/***/ },
+/* 23 */
+/***/ function(module, exports) {
+
+"use strict";
+"use strict";
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+module.exports = function (t) {
+  return function toMultipleSequenceExpressions(statements) {
+    var retStatements = [];
+    var bailed = void 0;
+    do {
+      var res = convert(statements);
+      bailed = res.bailed;
+      var seq = res.seq,
+          bailedAtIndex = res.bailedAtIndex;
+
+      if (seq) {
+        retStatements.push(t.expressionStatement(seq));
+      }
+      if (bailed && statements[bailedAtIndex]) {
+        retStatements.push(statements[bailedAtIndex]);
+      }
+      if (bailed) {
+        statements = statements.slice(bailedAtIndex + 1);
+        if (!statements.length) {
+          bailed = false;
+        }
+      }
+    } while (bailed);
+
+    return retStatements;
+
+    function convert(nodes) {
+      var exprs = [];
+
+      var _loop = function _loop(i) {
+        var bail = function bail() {
+          var seq = void 0;
+          if (exprs.length === 1) {
+            seq = exprs[0];
+          } else if (exprs.length) {
+            seq = t.sequenceExpression(exprs);
+          }
+
+          return {
+            seq: seq,
+            bailed: true,
+            bailedAtIndex: i
+          };
+        };
+
+        var node = nodes[i];
+        if (t.isExpression(node)) {
+          exprs.push(node);
+        } else if (t.isExpressionStatement(node)) {
+          exprs.push(node.expression);
+        } else if (t.isIfStatement(node)) {
+          var consequent = void 0;
+          if (node.consequent) {
+            var _res = convert([node.consequent]);
+            if (_res.bailed) {
+              return {
+                v: bail()
+              };
+            }
+            consequent = _res.seq;
+          }
+          var alternate = void 0;
+          if (node.alternate) {
+            var _res2 = convert([node.alternate]);
+            if (_res2.bailed) {
+              return {
+                v: bail()
+              };
+            }
+            alternate = _res2.seq;
+          }
+
+          if (!alternate && !consequent) {
+            exprs.push(node.test);
+          } else if (!alternate) {
+            exprs.push(t.logicalExpression("&&", node.test, consequent));
+          } else if (!consequent) {
+            exprs.push(t.logicalExpression("||", node.test, alternate));
+          } else {
+            exprs.push(t.conditionalExpression(node.test, consequent, alternate));
+          }
+        } else if (t.isBlockStatement(node)) {
+          var _res3 = convert(node.body);
+          if (_res3.bailed) {
+            return {
+              v: bail()
+            };
+          }
+          if (_res3.seq) {
+            exprs.push(_res3.seq);
+          }
+        } else {
+          return {
+            v: bail()
+          };
+        }
+      };
+
+      for (var i = 0; i < nodes.length; i++) {
+        var _ret = _loop(i);
+
+        if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+      }
+
+      var seq = void 0;
+      if (exprs.length === 1) {
+        seq = exprs[0];
+      } else if (exprs.length) {
+        seq = t.sequenceExpression(exprs);
+      }
+
+      /* eslint-disable no-self-assign */
+      seq = seq;
+      return { seq: seq };
+    }
+  };
+};
+
+/***/ },
+/* 24 */
+/***/ function(module, exports) {
+
+"use strict";
+"use strict";
+
+module.exports = function (_ref) {
+  var t = _ref.types;
+  var traverse = _ref.traverse;
+
+  var seen = Symbol("seen");
+
+  return {
+    name: "minify-constant-folding",
+    visitor: {
+
+      // Evaluate string expressions that are next to each other
+      // but are not actually a binary expression.
+      // "a" + b + "c" + "d" -> "a" + b + "cd"
+      BinaryExpression: function BinaryExpression(path) {
+        var literal = void 0,
+            bin = void 0;
+        if (path.get("right").isStringLiteral()) {
+          literal = path.get("right");
+          if (path.get("left").isBinaryExpression({ operator: "+" })) {
+            bin = path.get("left");
+          } else {
+            return;
+          }
+        } else if (path.get("left").isStringLiteral()) {
+          literal = path.get("left");
+          if (path.get("right").isBinaryExpression({ operator: "+" })) {
+            bin = path.get("right");
+          } else {
+            return;
+          }
+        } else {
+          return;
+        }
+
+        var relevant = getLeaf(bin, literal.key);
+
+        if (!relevant) {
+          return;
+        }
+
+        var value = literal.key === "right" ? relevant.node.value + literal.node.value : literal.node.value + relevant.node.value;
+
+        relevant.replaceWith(t.stringLiteral(value));
+        path.replaceWith(bin.node);
+
+        function getLeaf(path, direction) {
+          if (path.isStringLiteral()) {
+            return path;
+          } else if (path.isBinaryExpression({ operator: "+" })) {
+            return getLeaf(path.get(direction), direction);
+          }
+        }
+      },
+
+
+      // TODO: look into evaluating binding too (could result in more code, but gzip?)
+      Expression: function Expression(path) {
+        var node = path.node;
+
+
+        if (node[seen]) {
+          return;
+        }
+
+        if (path.isLiteral()) {
+          return;
+        }
+
+        if (!path.isPure()) {
+          return;
+        }
+
+        if (traverse.hasType(node, path.scope, "Identifier", t.FUNCTION_TYPES)) {
+          return;
+        }
+
+        // -0 maybe compared via dividing and then checking against -Infinity
+        // Also -X will always be -X.
+        if (t.isUnaryExpression(node, { operator: "-" }) && t.isNumericLiteral(node.argument)) {
+          return;
+        }
+
+        // We have a transform that converts true/false to !0/!1
+        if (t.isUnaryExpression(node, { operator: "!" }) && t.isNumericLiteral(node.argument)) {
+          if (node.argument.value === 0 || node.argument.value === 1) {
+            return;
+          }
+        }
+
+        // void 0 is used for undefined.
+        if (t.isUnaryExpression(node, { operator: "void" }) && t.isNumericLiteral(node.argument, { value: 0 })) {
+          return;
+        }
+
+        var res = path.evaluate();
+        if (res.confident) {
+          // Avoid fractions because they can be longer than the original expression.
+          // There is also issues with number percision?
+          if (typeof res.value === "number" && !Number.isInteger(res.value)) {
+            return;
+          }
+
+          // Preserve -0
+          if (typeof res.value === "number" && res.value === 0) {
+            if (1 / res.value === -Infinity) {
+              var _node2 = t.unaryExpression("-", t.numericLiteral(0), true);
+              _node2[seen] = true;
+              path.replaceWith(_node2);
+              return;
+            }
+          }
+
+          var _node = t.valueToNode(res.value);
+          _node[seen] = true;
+          path.replaceWith(_node);
+        }
+      }
+    }
+  };
+};
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+"use strict";
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var some = __webpack_require__(27);
+
+module.exports = function (_ref) {
+  var t = _ref.types,
+      traverse = _ref.traverse;
+
+  var removeOrVoid = __webpack_require__(26)(t);
+  var shouldRevisit = Symbol("shouldRevisit");
+
+  // this is used for tracking fn params that can be removed
+  // as traversal takes place from left and
+  // unused params can be removed only on the right
+  var markForRemoval = Symbol("markForRemoval");
+
+  var main = {
+    // remove side effectless statement
+    ExpressionStatement: function ExpressionStatement(path) {
+      if (path.get("expression").isPure()) {
+        removeOrVoid(path);
+      }
+    },
+
+
+    Function: {
+
+      // Let's take all the vars in a function that are not in the top level scope and hoist them
+      // with the first var declaration in the top-level scope. This transform in itself may
+      // not yield much returns (or even can be marginally harmful to size). However it's great
+      // for taking away statements from blocks that can be only expressions which the `simplify`
+      // plugin can turn into other things (e.g. if => conditional).
+      exit: function exit(path) {
+        // This hurts gzip size.
+        if (!this.optimizeRawSize) {
+          return;
+        }
+
+        var node = path.node,
+            scope = path.scope;
+
+        var seen = new Set();
+        var declars = [];
+        var mutations = [];
+
+        var _loop = function _loop(name) {
+          var binding = scope.bindings[name];
+          if (!binding.path.isVariableDeclarator()) {
+            return "continue";
+          }
+
+          var declarPath = binding.path.parentPath;
+          if (seen.has(declarPath)) {
+            return "continue";
+          }
+          seen.add(declarPath);
+
+          if (declarPath.parentPath.isForInStatement()) {
+            return "continue";
+          }
+
+          if (declarPath.parentPath.parentPath.isFunction()) {
+            return "continue";
+          }
+
+          if (!declarPath.node || !declarPath.node.declarations) {
+            return "continue";
+          }
+
+          var assignmentSequence = [];
+          var _iteratorNormalCompletion2 = true;
+          var _didIteratorError2 = false;
+          var _iteratorError2 = undefined;
+
+          try {
+            var _loop2 = function _loop2() {
+              var declar = _step2.value;
+
+              declars.push(declar);
+              if (declar.init) {
+                assignmentSequence.push(t.assignmentExpression("=", declar.id, declar.init));
+                mutations.push(function () {
+                  declar.init = null;
+                });
+              }
+            };
+
+            for (var _iterator2 = declarPath.node.declarations[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+              _loop2();
+            }
+          } catch (err) {
+            _didIteratorError2 = true;
+            _iteratorError2 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                _iterator2.return();
+              }
+            } finally {
+              if (_didIteratorError2) {
+                throw _iteratorError2;
+              }
+            }
+          }
+
+          if (assignmentSequence.length) {
+            mutations.push(function () {
+              return declarPath.replaceWith(t.sequenceExpression(assignmentSequence));
+            });
+          } else {
+            mutations.push(function () {
+              return removeOrVoid(declarPath);
+            });
+          }
+        };
+
+        for (var name in scope.bindings) {
+          var _ret = _loop(name);
+
+          if (_ret === "continue") continue;
+        }
+
+        if (declars.length) {
+          mutations.forEach(function (f) {
+            return f();
+          });
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = node.body.body[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var statement = _step.value;
+
+              if (t.isVariableDeclaration(statement)) {
+                var _statement$declaratio;
+
+                (_statement$declaratio = statement.declarations).push.apply(_statement$declaratio, declars);
+                return;
+              }
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          var varDecl = t.variableDeclaration("var", declars);
+          node.body.body.unshift(varDecl);
+        }
+      }
+    },
+
+    // Remove bindings with no references.
+    Scope: {
+      exit: function exit(path) {
+        if (path.node[shouldRevisit]) {
+          delete path.node[shouldRevisit];
+          path.visit();
+        }
+      },
+      enter: function enter(path) {
+        var _this = this;
+
+        if (path.isProgram()) {
+          return;
+        }
+
+        var scope = path.scope;
+
+        // if the scope is created by a function, we obtain its
+        // parameter list
+
+        var paramsList = path.isFunction() ? path.get("params") : [];
+
+        for (var i = paramsList.length - 1; i >= 0; i--) {
+          var param = paramsList[i];
+
+          if (param.isIdentifier()) {
+            var binding = scope.bindings[param.node.name];
+            if (binding.referenced) {
+              // when the first binding is referenced (right to left)
+              // exit without marking anything after this
+              break;
+            }
+
+            binding[markForRemoval] = true;
+            continue;
+          } else if (param.isAssignmentPattern()) {
+            var left = param.get("left");
+            var right = param.get("right");
+
+            if (left.isIdentifier() && right.isPure()) {
+              var _binding = scope.bindings[left.node.name];
+              if (_binding.referenced) {
+                // when the first binding is referenced (right to left)
+                // exit without marking anything after this
+                break;
+              }
+
+              _binding[markForRemoval] = true;
+              continue;
+            }
+          }
+
+          // other patterns - assignment, object have side-effects
+          // and cannot be safely removed
+          break;
+        }
+
+        var _loop3 = function _loop3(name) {
+          var binding = scope.bindings[name];
+
+          if (!binding.referenced && binding.kind !== "module") {
+            var _ret4 = function () {
+              if (binding.kind === "param" && (_this.keepFnArgs || !binding[markForRemoval])) {
+                return {
+                  v: "continue"
+                };
+              } else if (binding.path.isVariableDeclarator()) {
+                if (binding.path.parentPath.parentPath && binding.path.parentPath.parentPath.isForXStatement()) {
+                  // Can't remove if in a for-in/for-of/for-await statement `for (var x in wat)`.
+                  return {
+                    v: "continue"
+                  };
+                }
+              } else if (!scope.isPure(binding.path.node)) {
+                // TODO: AssignmentPattern are marked as impure and unused ids aren't removed yet
+                return {
+                  v: "continue"
+                };
+              } else if (binding.path.isFunctionExpression() || binding.path.isClassExpression()) {
+                // `bar(function foo() {})` foo is not referenced but it's used.
+                return {
+                  v: "continue"
+                };
+              }
+
+              var mutations = [];
+              var bail = false;
+              // Make sure none of the assignments value is used
+              binding.constantViolations.forEach(function (p) {
+                if (bail || p === binding.path) {
+                  return;
+                }
+
+                if (!p.parentPath.isExpressionStatement()) {
+                  bail = true;
+                }
+
+                if (p.isAssignmentExpression() && !p.get("right").isPure()) {
+                  mutations.push(function () {
+                    return p.replaceWith(p.get("right"));
+                  });
+                } else {
+                  mutations.push(function () {
+                    return removeOrVoid(p);
+                  });
+                }
+              });
+
+              if (bail) {
+                return {
+                  v: "continue"
+                };
+              }
+
+              if (binding.path.isVariableDeclarator() && binding.path.node.init && !scope.isPure(binding.path.node.init) && binding.path.parentPath.node.declarations) {
+                if (binding.path.parentPath.node.declarations.length !== 1) {
+                  return {
+                    v: "continue"
+                  };
+                }
+                // Bail out for ArrayPattern and ObjectPattern
+                if (!binding.path.get("id").isIdentifier()) {
+                  return {
+                    v: "continue"
+                  };
+                }
+
+                binding.path.parentPath.replaceWith(binding.path.node.init);
+              } else {
+                updateReferences(binding.path, _this);
+                removeOrVoid(binding.path);
+              }
+
+              mutations.forEach(function (f) {
+                return f();
+              });
+              scope.removeBinding(name);
+            }();
+
+            if ((typeof _ret4 === "undefined" ? "undefined" : _typeof(_ret4)) === "object") return _ret4.v;
+          } else if (binding.constant) {
+            if (binding.path.isFunctionDeclaration() || binding.path.isVariableDeclarator() && binding.path.get("init").isFunction()) {
+              var _ret5 = function () {
+                var fun = binding.path.isFunctionDeclaration() ? binding.path : binding.path.get("init");
+                var allInside = true;
+                var _iteratorNormalCompletion3 = true;
+                var _didIteratorError3 = false;
+                var _iteratorError3 = undefined;
+
+                try {
+                  for (var _iterator3 = binding.referencePaths[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var ref = _step3.value;
+
+                    if (!ref.find(function (p) {
+                      return p.node === fun.node;
+                    })) {
+                      allInside = false;
+                      break;
+                    }
+                  }
+                } catch (err) {
+                  _didIteratorError3 = true;
+                  _iteratorError3 = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                      _iterator3.return();
+                    }
+                  } finally {
+                    if (_didIteratorError3) {
+                      throw _iteratorError3;
+                    }
+                  }
+                }
+
+                if (allInside) {
+                  scope.removeBinding(name);
+                  updateReferences(binding.path, _this);
+                  removeOrVoid(binding.path);
+                  return {
+                    v: "continue"
+                  };
+                }
+              }();
+
+              if ((typeof _ret5 === "undefined" ? "undefined" : _typeof(_ret5)) === "object") return _ret5.v;
+            }
+
+            if (binding.references === 1 && binding.kind !== "param" && binding.kind !== "module" && binding.constant) {
+              var _ret6 = function () {
+                var replacement = binding.path.node;
+                var replacementPath = binding.path;
+                if (t.isVariableDeclarator(replacement)) {
+                  replacement = replacement.init;
+                  // Bail out for ArrayPattern and ObjectPattern
+                  // TODO: maybe a more intelligent approach instead of simply bailing out
+                  if (!replacementPath.get("id").isIdentifier()) {
+                    return {
+                      v: "continue"
+                    };
+                  }
+                  replacementPath = replacementPath.get("init");
+                }
+                if (!replacement) {
+                  return {
+                    v: "continue"
+                  };
+                }
+
+                if (!scope.isPure(replacement, true)) {
+                  return {
+                    v: "continue"
+                  };
+                }
+
+                if (binding.referencePaths.length > 1) {
+                  throw new Error("Expected only one reference");
+                }
+
+                var bail = false;
+                var refPath = binding.referencePaths[0];
+
+                if (replacementPath.isIdentifier()) {
+                  bail = refPath.scope.getBinding(replacement.name) !== scope.getBinding(replacement.name);
+                } else {
+                  replacementPath.traverse({
+                    Function: function Function(path) {
+                      path.skip();
+                    },
+                    ReferencedIdentifier: function ReferencedIdentifier(_ref2) {
+                      var node = _ref2.node;
+
+                      if (bail) {
+                        return;
+                      }
+                      bail = refPath.scope.getBinding(node.name) !== scope.getBinding(node.name);
+                    }
+                  });
+                }
+
+                if (bail) {
+                  return {
+                    v: "continue"
+                  };
+                }
+
+                var parent = binding.path.parent;
+                if (t.isVariableDeclaration(parent)) {
+                  parent = binding.path.parentPath.parent;
+                }
+
+                // 1. Make sure we share the parent with the node. In other words it's lexically defined
+                // and not in an if statement or otherwise.
+                // 2. If the replacement is an object then we have to make sure we are not in a loop or a function
+                // because otherwise we'll be inlining and doing a lot more allocation than we have to
+                // which would also could affect correctness in that they are not the same reference.
+                var mayLoop = false;
+                var sharesRoot = refPath.find(function (_ref3) {
+                  var node = _ref3.node;
+
+                  if (!mayLoop) {
+                    mayLoop = t.isWhileStatement(node) || t.isFor(node) || t.isFunction(node);
+                  }
+                  return node === parent;
+                });
+
+                // Anything that inherits from Object.
+                var isObj = function isObj(n) {
+                  return t.isFunction(n) || t.isObjectExpression(n) || t.isArrayExpression(n);
+                };
+                var isReplacementObj = isObj(replacement) || some(replacement, isObj);
+
+                if (!sharesRoot || isReplacementObj && mayLoop) {
+                  return {
+                    v: "continue"
+                  };
+                }
+
+                var replaced = replace(binding.referencePaths[0], {
+                  binding: binding,
+                  scope: scope,
+                  replacement: replacement
+                });
+
+                if (replaced) {
+                  scope.removeBinding(name);
+                  if (binding.path.node) {
+                    removeOrVoid(binding.path);
+                  }
+                }
+              }();
+
+              if ((typeof _ret6 === "undefined" ? "undefined" : _typeof(_ret6)) === "object") return _ret6.v;
+            }
+          }
+        };
+
+        for (var name in scope.bindings) {
+          var _ret3 = _loop3(name);
+
+          if (_ret3 === "continue") continue;
+        }
+      }
+    },
+
+    // Remove unreachable code.
+    BlockStatement: function BlockStatement(path) {
+      var paths = path.get("body");
+
+      var purge = false;
+
+      for (var i = 0; i < paths.length; i++) {
+        var p = paths[i];
+
+        if (!purge && p.isCompletionStatement()) {
+          purge = true;
+          continue;
+        }
+
+        if (purge && !canExistAfterCompletion(p)) {
+          removeOrVoid(p);
+        }
+      }
+    },
+
+
+    // Double check unreachable code and remove return statements that
+    // have no semantic meaning
+    ReturnStatement: function ReturnStatement(path) {
+      var node = path.node;
+
+      if (!path.inList) {
+        return;
+      }
+
+      // Not last in it's block? (See BlockStatement visitor)
+      if (path.container.length - 1 !== path.key && !canExistAfterCompletion(path.getSibling(path.key + 1)) && path.parentPath.isBlockStatement()) {
+        // This is probably a new oppurtinity by some other transform
+        // let's call the block visitor on this again before proceeding.
+        path.parentPath.pushContext(path.context);
+        path.parentPath.visit();
+        path.parentPath.popContext();
+
+        return;
+      }
+
+      if (node.argument) {
+        return;
+      }
+
+      var noNext = true;
+      var parentPath = path.parentPath;
+      while (parentPath && !parentPath.isFunction() && noNext) {
+        var nextPath = parentPath.getSibling(parentPath.key + 1);
+        if (nextPath.node) {
+          if (nextPath.isReturnStatement()) {
+            nextPath.pushContext(path.context);
+            nextPath.visit();
+            nextPath.popContext();
+            if (parentPath.getSibling(parentPath.key + 1).node) {
+              noNext = false;
+              break;
+            }
+          } else {
+            noNext = false;
+            break;
+          }
+        }
+
+        parentPath = parentPath.parentPath;
+      }
+
+      if (noNext) {
+        removeOrVoid(path);
+      }
+    },
+    ConditionalExpression: function ConditionalExpression(path) {
+      var node = path.node;
+
+      var evaluateTest = path.get("test").evaluateTruthy();
+      if (evaluateTest === true) {
+        path.replaceWith(node.consequent);
+      } else if (evaluateTest === false) {
+        path.replaceWith(node.alternate);
+      }
+    },
+
+
+    IfStatement: {
+      exit: function exit(path) {
+        var consequent = path.get("consequent");
+        var alternate = path.get("alternate");
+        var test = path.get("test");
+
+        var evaluateTest = test.evaluateTruthy();
+
+        // we can check if a test will be truthy 100% and if so then we can inline
+        // the consequent and completely ignore the alternate
+        //
+        //   if (true) { foo; } -> { foo; }
+        //   if ("foo") { foo; } -> { foo; }
+        //
+        if (evaluateTest === true) {
+          path.replaceWithMultiple([].concat(_toConsumableArray(toStatements(consequent)), _toConsumableArray(extractVars(alternate))));
+          return;
+        }
+
+        // we can check if a test will be falsy 100% and if so we can inline the
+        // alternate if there is one and completely remove the consequent
+        //
+        //   if ("") { bar; } else { foo; } -> { foo; }
+        //   if ("") { bar; } ->
+        //
+        if (evaluateTest === false) {
+          if (alternate.node) {
+            path.replaceWithMultiple([].concat(_toConsumableArray(toStatements(alternate)), _toConsumableArray(extractVars(consequent))));
+            return;
+          } else {
+            path.replaceWithMultiple(extractVars(consequent));
+          }
+        }
+
+        // remove alternate blocks that are empty
+        //
+        //   if (foo) { foo; } else {} -> if (foo) { foo; }
+        //
+        if (alternate.isBlockStatement() && !alternate.node.body.length) {
+          alternate.remove();
+          // For if-statements babel-traverse replaces with an empty block
+          path.node.alternate = null;
+        }
+
+        // if the consequent block is empty turn alternate blocks into a consequent
+        // and flip the test
+        //
+        //   if (foo) {} else { bar; } -> if (!foo) { bar; }
+        //
+        if (consequent.isBlockStatement() && !consequent.node.body.length && alternate.isBlockStatement() && alternate.node.body.length) {
+          consequent.replaceWith(alternate.node);
+          alternate.remove();
+          // For if-statements babel-traverse replaces with an empty block
+          path.node.alternate = null;
+          test.replaceWith(t.unaryExpression("!", test.node, true));
+        }
+      }
+    },
+
+    SwitchStatement: {
+      exit: function exit(path) {
+        var evaluated = path.get("discriminant").evaluate();
+
+        if (!evaluated.confident) return;
+
+        var discriminant = evaluated.value;
+        var cases = path.get("cases");
+
+        var matchingCaseIndex = -1;
+        var defaultCaseIndex = -1;
+
+        for (var i = 0; i < cases.length; i++) {
+          var test = cases[i].get("test");
+
+          // handle default case
+          if (test.node === null) {
+            defaultCaseIndex = i;
+            continue;
+          }
+
+          var testResult = test.evaluate();
+
+          // if we are not able to deternine a test during
+          // compile time, we terminate immediately
+          if (!testResult.confident) return;
+
+          if (testResult.value === discriminant) {
+            matchingCaseIndex = i;
+            break;
+          }
+        }
+
+        var result = void 0;
+
+        if (matchingCaseIndex === -1) {
+          if (defaultCaseIndex === -1) {
+            path.skip();
+            path.replaceWithMultiple(extractVars(path));
+            return;
+          } else {
+            result = getStatementsUntilBreak(defaultCaseIndex);
+          }
+        } else {
+          result = getStatementsUntilBreak(matchingCaseIndex);
+        }
+
+        if (result.bail) return;
+
+        // we extract vars from the entire switch statement
+        // and there will be duplicates which
+        // will be again removed by DCE
+        replaceSwitch([].concat(_toConsumableArray(extractVars(path)), _toConsumableArray(result.statements)));
+
+        function getStatementsUntilBreak(start) {
+          var result = {
+            bail: false,
+            statements: []
+          };
+
+          for (var _i = start; _i < cases.length; _i++) {
+            var consequent = cases[_i].get("consequent");
+
+            for (var j = 0; j < consequent.length; j++) {
+              var _isBreaking = isBreaking(consequent[j], path);
+              if (_isBreaking.bail) {
+                result.bail = true;
+                return result;
+              }
+              if (_isBreaking.break) {
+                // compute no more
+                // exit out of the loop
+                return result;
+              } else {
+                result.statements.push(consequent[j].node);
+              }
+            }
+          }
+
+          return result;
+        }
+
+        function replaceSwitch(statements) {
+          var isBlockRequired = false;
+
+          for (var _i2 = 0; _i2 < statements.length; _i2++) {
+            if (t.isVariableDeclaration(statements[_i2], { kind: "let" })) {
+              isBlockRequired = true;
+              break;
+            }
+            if (t.isVariableDeclaration(statements[_i2], { kind: "const" })) {
+              isBlockRequired = true;
+              break;
+            }
+          }
+
+          if (isBlockRequired) {
+            path.replaceWith(t.BlockStatement(statements));
+          } else {
+            path.replaceWithMultiple(statements);
+          }
+        }
+      }
+    },
+
+    WhileStatement: function WhileStatement(path) {
+      var test = path.get("test");
+      var result = test.evaluate();
+      if (result.confident && !result.value) {
+        path.remove();
+      }
+    },
+    ForStatement: function ForStatement(path) {
+      var test = path.get("test");
+      var result = test.evaluate();
+      if (result.confident) {
+        if (result.value) {
+          test.remove();
+        } else {
+          path.remove();
+        }
+      }
+    },
+    DoWhileStatement: function DoWhileStatement(path) {
+      var test = path.get("test");
+      var result = test.evaluate();
+      if (result.confident && !result.value) {
+        path.replaceWith(path.get("body").node);
+      }
+    },
+
+
+    // Join assignment and definition when in sequence.
+    // var x; x = 1; -> var x = 1;
+    AssignmentExpression: function AssignmentExpression(path) {
+      if (!path.get("left").isIdentifier() || !path.parentPath.isExpressionStatement()) {
+        return;
+      }
+
+      var prev = path.parentPath.getSibling(path.parentPath.key - 1);
+      if (!(prev && prev.isVariableDeclaration())) {
+        return;
+      }
+
+      var declars = prev.node.declarations;
+      if (declars.length !== 1 || declars[0].init || declars[0].id.name !== path.get("left").node.name) {
+        return;
+      }
+      declars[0].init = path.node.right;
+      removeOrVoid(path);
+    },
+
+
+    // Remove named function expression name. While this is dangerous as it changes
+    // `function.name` all minifiers do it and hence became a standard.
+    "FunctionExpression|ClassExpression": function FunctionExpressionClassExpression(path) {
+      if (!this.keepFnName) {
+        removeUnreferencedId(path);
+      }
+    },
+
+
+    // Put the `var` in the left if feasible.
+    ForInStatement: function ForInStatement(path) {
+      var left = path.get("left");
+      if (!left.isIdentifier()) {
+        return;
+      }
+
+      var binding = path.scope.getBinding(left.node.name);
+      if (!binding) {
+        return;
+      }
+
+      if (binding.scope.getFunctionParent() !== path.scope.getFunctionParent()) {
+        return;
+      }
+
+      if (!binding.path.isVariableDeclarator()) {
+        return;
+      }
+
+      if (binding.path.parentPath.parentPath.isForInStatement({ left: binding.path.parent })) {
+        return;
+      }
+
+      // If it has company then it's probably more efficient to keep.
+      if (binding.path.parent.declarations.length > 1) {
+        return;
+      }
+
+      // meh
+      if (binding.path.node.init) {
+        return;
+      }
+
+      removeOrVoid(binding.path);
+      path.node.left = t.variableDeclaration("var", [t.variableDeclarator(left.node)]);
+      binding.path = path.get("left").get("declarations")[0];
+    }
+  };
+
+  return {
+    name: "minify-dead-code-elimination",
+    visitor: {
+      Program: function Program(path) {
+        var _ref4 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+            _ref4$opts = _ref4.opts;
+
+        _ref4$opts = _ref4$opts === undefined ? {} : _ref4$opts;
+        var _ref4$opts$optimizeRa = _ref4$opts.optimizeRawSize,
+            optimizeRawSize = _ref4$opts$optimizeRa === undefined ? false : _ref4$opts$optimizeRa,
+            _ref4$opts$keepFnName = _ref4$opts.keepFnName,
+            keepFnName = _ref4$opts$keepFnName === undefined ? false : _ref4$opts$keepFnName,
+            _ref4$opts$keepFnArgs = _ref4$opts.keepFnArgs,
+            keepFnArgs = _ref4$opts$keepFnArgs === undefined ? false : _ref4$opts$keepFnArgs;
+
+        // We need to run this plugin in isolation.
+        path.traverse(main, {
+          functionToBindings: new Map(),
+          optimizeRawSize: optimizeRawSize,
+          keepFnName: keepFnName,
+          keepFnArgs: keepFnArgs
+        });
+      }
+    }
+  };
+
+  function toStatements(path) {
+    var node = path.node;
+
+    if (path.isBlockStatement()) {
+      var hasBlockScoped = false;
+
+      for (var i = 0; i < node.body.length; i++) {
+        var bodyNode = node.body[i];
+        if (t.isBlockScoped(bodyNode)) {
+          hasBlockScoped = true;
+        }
+      }
+
+      if (!hasBlockScoped) {
+        return node.body;
+      }
+    }
+    return [node];
+  }
+
+  // Extracts vars from a path
+  // Useful for removing blocks or paths that can contain
+  // variable declarations inside them
+  // Note:
+  // drops are inits
+  // extractVars({ var x = 5, y = x }) => var x, y;
+  function extractVars(path) {
+    var declarators = [];
+
+    if (path.isVariableDeclaration({ kind: "var" })) {
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
+
+      try {
+        for (var _iterator4 = path.node.declarations[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var decl = _step4.value;
+
+          declarators.push(t.variableDeclarator(decl.id));
+        }
+      } catch (err) {
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+            _iterator4.return();
+          }
+        } finally {
+          if (_didIteratorError4) {
+            throw _iteratorError4;
+          }
+        }
+      }
+    } else {
+      path.traverse({
+        VariableDeclaration: function VariableDeclaration(varPath) {
+          if (!varPath.isVariableDeclaration({ kind: "var" })) return;
+          if (!isSameFunctionScope(varPath, path)) return;
+
+          var _iteratorNormalCompletion5 = true;
+          var _didIteratorError5 = false;
+          var _iteratorError5 = undefined;
+
+          try {
+            for (var _iterator5 = varPath.node.declarations[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+              var _decl = _step5.value;
+
+              declarators.push(t.variableDeclarator(_decl.id));
+            }
+          } catch (err) {
+            _didIteratorError5 = true;
+            _iteratorError5 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                _iterator5.return();
+              }
+            } finally {
+              if (_didIteratorError5) {
+                throw _iteratorError5;
+              }
+            }
+          }
+        }
+      });
+    }
+
+    if (declarators.length <= 0) return [];
+
+    return [t.variableDeclaration("var", declarators)];
+  }
+
+  function replace(path, options) {
+    var replacement = options.replacement,
+        scope = options.scope,
+        binding = options.binding;
+
+    // Same name, different binding.
+
+    if (scope.getBinding(path.node.name) !== binding) {
+      return;
+    }
+
+    // We don't want to move code around to different scopes because:
+    // 1. Original bindings that is referenced could be shadowed
+    // 2. Moving defintions to potentially hot code is bad
+    if (scope !== path.scope) {
+      var _ret7 = function () {
+        if (t.isClass(replacement) || t.isFunction(replacement)) {
+          return {
+            v: void 0
+          };
+        }
+
+        var bail = false;
+        traverse(replacement, {
+          Function: function Function(path) {
+            if (bail) {
+              return;
+            }
+            bail = true;
+            path.stop();
+          }
+        }, scope);
+
+        if (bail) {
+          return {
+            v: void 0
+          };
+        }
+      }();
+
+      if ((typeof _ret7 === "undefined" ? "undefined" : _typeof(_ret7)) === "object") return _ret7.v;
+    }
+
+    // Avoid recursion.
+    if (path.find(function (_ref5) {
+      var node = _ref5.node;
+      return node === replacement;
+    })) {
+      return;
+    }
+
+    // https://github.com/babel/babili/issues/130
+    if (!t.isExpression(replacement)) {
+      t.toExpression(replacement);
+    }
+
+    // We don't remove fn name here, we let the FnExpr & ClassExpr visitors
+    // check its references and remove unreferenced ones
+    // if (t.isFunction(replacement)) {
+    //   replacement.id = null;
+    // }
+
+    path.replaceWith(replacement);
+    return true;
+  }
+
+  function updateReferences(fnToDeletePath) {
+    if (!fnToDeletePath.isFunction()) {
+      return;
+    }
+
+    fnToDeletePath.traverse({
+      ReferencedIdentifier: function ReferencedIdentifier(path) {
+        var node = path.node,
+            scope = path.scope;
+
+        var binding = scope.getBinding(node.name);
+
+        if (!binding || !binding.path.isFunction() || binding.scope === scope || !binding.constant) {
+          return;
+        }
+
+        var index = binding.referencePaths.indexOf(path);
+        if (index === -1) {
+          return;
+        }
+        binding.references--;
+        binding.referencePaths.splice(index, 1);
+        if (binding.references === 0) {
+          binding.referenced = false;
+        }
+
+        if (binding.references <= 1 && binding.scope.path.node) {
+          binding.scope.path.node[shouldRevisit] = true;
+        }
+      }
+    });
+  }
+
+  function removeUnreferencedId(path) {
+    var id = path.get("id").node;
+    if (!id) {
+      return;
+    }
+
+    var node = path.node,
+        scope = path.scope;
+
+    var binding = scope.getBinding(id.name);
+
+    // Check if shadowed or is not referenced.
+    if (binding.path.node !== node || !binding.referenced) {
+      node.id = null;
+    }
+  }
+
+  // path1 -> path2
+  // is path1 an ancestor of path2
+  function isAncestor(path1, path2) {
+    return !!path2.findParent(function (parent) {
+      return parent === path1;
+    });
+  }
+
+  function isSameFunctionScope(path1, path2) {
+    return path1.scope.getFunctionParent() === path2.scope.getFunctionParent();
+  }
+
+  // tells if a "stmt" is a break statement that would break the "path"
+  function isBreaking(stmt, path) {
+    if (stmt.isBreakStatement()) {
+      return _isBreaking(stmt, path);
+    }
+
+    var isBroken = false;
+    var result = {
+      break: false,
+      bail: false
+    };
+
+    stmt.traverse({
+      BreakStatement: function BreakStatement(breakPath) {
+        // if we already detected a break statement,
+        if (isBroken) return;
+
+        result = _isBreaking(breakPath, path);
+
+        if (result.bail || result.break) {
+          isBroken = true;
+        }
+      }
+    });
+
+    return result;
+
+    function _isBreaking(breakPath, path) {
+      var label = breakPath.get("label");
+
+      if (label.node !== null) {
+        // labels are fn scoped and not accessible by inner functions
+        // path is the switch statement
+        if (!isSameFunctionScope(path, breakPath)) {
+          // we don't have to worry about this break statement
+          return {
+            break: false,
+            bail: false
+          };
+        }
+
+        // here we handle the break labels
+        // if they are outside switch, we bail out
+        // if they are within the case, we keep them
+        var labelPath = void 0;
+        if (path.scope.getLabel) {
+          labelPath = getLabel(label.node.name, path);
+        } else {
+          labelPath = path.scope.getBinding(label.node.name).path;
+        }
+        var _isAncestor = isAncestor(labelPath, path);
+
+        return {
+          bail: _isAncestor,
+          break: _isAncestor
+        };
+      }
+
+      // set the flag that it is indeed breaking
+      var isBreak = true;
+
+      // this flag is to capture
+      // switch(0) { case 0: while(1) if (x) break; }
+      var possibleRunTimeBreak = false;
+
+      // and compute if it's breaking the correct thing
+      var parent = breakPath.parentPath;
+
+      while (parent !== stmt.parentPath) {
+        // loops and nested switch cases
+        if (parent.isLoop() || parent.isSwitchCase()) {
+          // invalidate all the possible runtime breaks captured
+          // while (1) { if (x) break; }
+          possibleRunTimeBreak = false;
+
+          // and set that it's not breaking our switch statement
+          isBreak = false;
+          break;
+        }
+        //
+        // this is a special case and depends on
+        // the fact that SwitchStatement is handled in the
+        // exit hook of the traverse
+        //
+        // switch (0) {
+        //   case 0: if (x) break;
+        // }
+        //
+        // here `x` is runtime only.
+        // in this case, we need to bail out. So we depend on exit hook
+        // of switch so that, it would have visited the IfStatement first
+        // before the SwitchStatement and would have removed the
+        // IfStatement if it was a compile time determined
+        //
+        if (parent.isIfStatement()) {
+          possibleRunTimeBreak = true;
+        }
+        parent = parent.parentPath;
+      }
+
+      return {
+        break: possibleRunTimeBreak || isBreak,
+        bail: possibleRunTimeBreak
+      };
+    }
+  }
+
+  // things that are hoisted
+  function canExistAfterCompletion(path) {
+    return path.isFunctionDeclaration() || path.isVariableDeclaration({ kind: "var" });
+  }
+
+  function getLabel(name, _path) {
+    var label = void 0,
+        path = _path;
+    do {
+      label = path.scope.getLabel(name);
+      if (label) {
+        return label;
+      }
+    } while (path = path.parentPath);
+    return null;
+  }
+};
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(22);
+
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global, module) {/**
+ * lodash (Custom Build) <https://lodash.com/>
+ * Build: `lodash modularize exports="npm" -o ./`
+ * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+ * Released under MIT license <https://lodash.com/license>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ */
+
+/** Used as the size to enable large array optimizations. */
+var LARGE_ARRAY_SIZE = 200;
+
+/** Used as the `TypeError` message for "Functions" methods. */
+var FUNC_ERROR_TEXT = 'Expected a function';
+
+/** Used to stand-in for `undefined` hash values. */
+var HASH_UNDEFINED = '__lodash_hash_undefined__';
+
+/** Used to compose bitmasks for comparison styles. */
+var UNORDERED_COMPARE_FLAG = 1,
+    PARTIAL_COMPARE_FLAG = 2;
+
+/** Used as references for various `Number` constants. */
+var INFINITY = 1 / 0,
+    MAX_SAFE_INTEGER = 9007199254740991;
+
+/** `Object#toString` result references. */
+var argsTag = '[object Arguments]',
+    arrayTag = '[object Array]',
+    boolTag = '[object Boolean]',
+    dateTag = '[object Date]',
+    errorTag = '[object Error]',
+    funcTag = '[object Function]',
+    genTag = '[object GeneratorFunction]',
+    mapTag = '[object Map]',
+    numberTag = '[object Number]',
+    objectTag = '[object Object]',
+    promiseTag = '[object Promise]',
+    regexpTag = '[object RegExp]',
+    setTag = '[object Set]',
+    stringTag = '[object String]',
+    symbolTag = '[object Symbol]',
+    weakMapTag = '[object WeakMap]';
+
+var arrayBufferTag = '[object ArrayBuffer]',
+    dataViewTag = '[object DataView]',
+    float32Tag = '[object Float32Array]',
+    float64Tag = '[object Float64Array]',
+    int8Tag = '[object Int8Array]',
+    int16Tag = '[object Int16Array]',
+    int32Tag = '[object Int32Array]',
+    uint8Tag = '[object Uint8Array]',
+    uint8ClampedTag = '[object Uint8ClampedArray]',
+    uint16Tag = '[object Uint16Array]',
+    uint32Tag = '[object Uint32Array]';
+
+/** Used to match property names within property paths. */
+var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
+    reIsPlainProp = /^\w*$/,
+    reLeadingDot = /^\./,
+    rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
+
+/**
+ * Used to match `RegExp`
+ * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
+ */
+var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+
+/** Used to match backslashes in property paths. */
+var reEscapeChar = /\\(\\)?/g;
+
+/** Used to detect host constructors (Safari). */
+var reIsHostCtor = /^\[object .+?Constructor\]$/;
+
+/** Used to detect unsigned integer values. */
+var reIsUint = /^(?:0|[1-9]\d*)$/;
+
+/** Used to identify `toStringTag` values of typed arrays. */
+var typedArrayTags = {};
+typedArrayTags[float32Tag] = typedArrayTags[float64Tag] =
+typedArrayTags[int8Tag] = typedArrayTags[int16Tag] =
+typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] =
+typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] =
+typedArrayTags[uint32Tag] = true;
+typedArrayTags[argsTag] = typedArrayTags[arrayTag] =
+typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] =
+typedArrayTags[dataViewTag] = typedArrayTags[dateTag] =
+typedArrayTags[errorTag] = typedArrayTags[funcTag] =
+typedArrayTags[mapTag] = typedArrayTags[numberTag] =
+typedArrayTags[objectTag] = typedArrayTags[regexpTag] =
+typedArrayTags[setTag] = typedArrayTags[stringTag] =
+typedArrayTags[weakMapTag] = false;
+
+/** Detect free variable `global` from Node.js. */
+var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+
+/** Detect free variable `self`. */
+var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+/** Used as a reference to the global object. */
+var root = freeGlobal || freeSelf || Function('return this')();
+
+/** Detect free variable `exports`. */
+var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+
+/** Detect free variable `module`. */
+var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
+
+/** Detect the popular CommonJS extension `module.exports`. */
+var moduleExports = freeModule && freeModule.exports === freeExports;
+
+/** Detect free variable `process` from Node.js. */
+var freeProcess = moduleExports && freeGlobal.process;
+
+/** Used to access faster Node.js helpers. */
+var nodeUtil = (function() {
+  try {
+    return freeProcess && freeProcess.binding('util');
+  } catch (e) {}
+}());
+
+/* Node.js helper references. */
+var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
+
+/**
+ * A specialized version of `_.some` for arrays without support for iteratee
+ * shorthands.
+ *
+ * @private
+ * @param {Array} [array] The array to iterate over.
+ * @param {Function} predicate The function invoked per iteration.
+ * @returns {boolean} Returns `true` if any element passes the predicate check,
+ *  else `false`.
+ */
+function arraySome(array, predicate) {
+  var index = -1,
+      length = array ? array.length : 0;
+
+  while (++index < length) {
+    if (predicate(array[index], index, array)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * The base implementation of `_.property` without support for deep paths.
+ *
+ * @private
+ * @param {string} key The key of the property to get.
+ * @returns {Function} Returns the new accessor function.
+ */
+function baseProperty(key) {
+  return function(object) {
+    return object == null ? undefined : object[key];
+  };
+}
+
+/**
+ * The base implementation of `_.times` without support for iteratee shorthands
+ * or max array length checks.
+ *
+ * @private
+ * @param {number} n The number of times to invoke `iteratee`.
+ * @param {Function} iteratee The function invoked per iteration.
+ * @returns {Array} Returns the array of results.
+ */
+function baseTimes(n, iteratee) {
+  var index = -1,
+      result = Array(n);
+
+  while (++index < n) {
+    result[index] = iteratee(index);
+  }
+  return result;
+}
+
+/**
+ * The base implementation of `_.unary` without support for storing metadata.
+ *
+ * @private
+ * @param {Function} func The function to cap arguments for.
+ * @returns {Function} Returns the new capped function.
+ */
+function baseUnary(func) {
+  return function(value) {
+    return func(value);
+  };
+}
+
+/**
+ * Gets the value at `key` of `object`.
+ *
+ * @private
+ * @param {Object} [object] The object to query.
+ * @param {string} key The key of the property to get.
+ * @returns {*} Returns the property value.
+ */
+function getValue(object, key) {
+  return object == null ? undefined : object[key];
+}
+
+/**
+ * Checks if `value` is a host object in IE < 9.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a host object, else `false`.
+ */
+function isHostObject(value) {
+  // Many host objects are `Object` objects that can coerce to strings
+  // despite having improperly defined `toString` methods.
+  var result = false;
+  if (value != null && typeof value.toString != 'function') {
+    try {
+      result = !!(value + '');
+    } catch (e) {}
+  }
+  return result;
+}
+
+/**
+ * Converts `map` to its key-value pairs.
+ *
+ * @private
+ * @param {Object} map The map to convert.
+ * @returns {Array} Returns the key-value pairs.
+ */
+function mapToArray(map) {
+  var index = -1,
+      result = Array(map.size);
+
+  map.forEach(function(value, key) {
+    result[++index] = [key, value];
+  });
+  return result;
+}
+
+/**
+ * Creates a unary function that invokes `func` with its argument transformed.
+ *
+ * @private
+ * @param {Function} func The function to wrap.
+ * @param {Function} transform The argument transform.
+ * @returns {Function} Returns the new function.
+ */
+function overArg(func, transform) {
+  return function(arg) {
+    return func(transform(arg));
+  };
+}
+
+/**
+ * Converts `set` to an array of its values.
+ *
+ * @private
+ * @param {Object} set The set to convert.
+ * @returns {Array} Returns the values.
+ */
+function setToArray(set) {
+  var index = -1,
+      result = Array(set.size);
+
+  set.forEach(function(value) {
+    result[++index] = value;
+  });
+  return result;
+}
+
+/** Used for built-in method references. */
+var arrayProto = Array.prototype,
+    funcProto = Function.prototype,
+    objectProto = Object.prototype;
+
+/** Used to detect overreaching core-js shims. */
+var coreJsData = root['__core-js_shared__'];
+
+/** Used to detect methods masquerading as native. */
+var maskSrcKey = (function() {
+  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
+  return uid ? ('Symbol(src)_1.' + uid) : '';
+}());
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString = funcProto.toString;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString = objectProto.toString;
+
+/** Used to detect if a method is native. */
+var reIsNative = RegExp('^' +
+  funcToString.call(hasOwnProperty).replace(reRegExpChar, '\\$&')
+  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+);
+
+/** Built-in value references. */
+var Symbol = root.Symbol,
+    Uint8Array = root.Uint8Array,
+    propertyIsEnumerable = objectProto.propertyIsEnumerable,
+    splice = arrayProto.splice;
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeKeys = overArg(Object.keys, Object);
+
+/* Built-in method references that are verified to be native. */
+var DataView = getNative(root, 'DataView'),
+    Map = getNative(root, 'Map'),
+    Promise = getNative(root, 'Promise'),
+    Set = getNative(root, 'Set'),
+    WeakMap = getNative(root, 'WeakMap'),
+    nativeCreate = getNative(Object, 'create');
+
+/** Used to detect maps, sets, and weakmaps. */
+var dataViewCtorString = toSource(DataView),
+    mapCtorString = toSource(Map),
+    promiseCtorString = toSource(Promise),
+    setCtorString = toSource(Set),
+    weakMapCtorString = toSource(WeakMap);
+
+/** Used to convert symbols to primitives and strings. */
+var symbolProto = Symbol ? Symbol.prototype : undefined,
+    symbolValueOf = symbolProto ? symbolProto.valueOf : undefined,
+    symbolToString = symbolProto ? symbolProto.toString : undefined;
+
+/**
+ * Creates a hash object.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function Hash(entries) {
+  var index = -1,
+      length = entries ? entries.length : 0;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the hash.
+ *
+ * @private
+ * @name clear
+ * @memberOf Hash
+ */
+function hashClear() {
+  this.__data__ = nativeCreate ? nativeCreate(null) : {};
+}
+
+/**
+ * Removes `key` and its value from the hash.
+ *
+ * @private
+ * @name delete
+ * @memberOf Hash
+ * @param {Object} hash The hash to modify.
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function hashDelete(key) {
+  return this.has(key) && delete this.__data__[key];
+}
+
+/**
+ * Gets the hash value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf Hash
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function hashGet(key) {
+  var data = this.__data__;
+  if (nativeCreate) {
+    var result = data[key];
+    return result === HASH_UNDEFINED ? undefined : result;
+  }
+  return hasOwnProperty.call(data, key) ? data[key] : undefined;
+}
+
+/**
+ * Checks if a hash value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf Hash
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function hashHas(key) {
+  var data = this.__data__;
+  return nativeCreate ? data[key] !== undefined : hasOwnProperty.call(data, key);
+}
+
+/**
+ * Sets the hash `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf Hash
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the hash instance.
+ */
+function hashSet(key, value) {
+  var data = this.__data__;
+  data[key] = (nativeCreate && value === undefined) ? HASH_UNDEFINED : value;
+  return this;
+}
+
+// Add methods to `Hash`.
+Hash.prototype.clear = hashClear;
+Hash.prototype['delete'] = hashDelete;
+Hash.prototype.get = hashGet;
+Hash.prototype.has = hashHas;
+Hash.prototype.set = hashSet;
+
+/**
+ * Creates an list cache object.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function ListCache(entries) {
+  var index = -1,
+      length = entries ? entries.length : 0;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the list cache.
+ *
+ * @private
+ * @name clear
+ * @memberOf ListCache
+ */
+function listCacheClear() {
+  this.__data__ = [];
+}
+
+/**
+ * Removes `key` and its value from the list cache.
+ *
+ * @private
+ * @name delete
+ * @memberOf ListCache
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function listCacheDelete(key) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  if (index < 0) {
+    return false;
+  }
+  var lastIndex = data.length - 1;
+  if (index == lastIndex) {
+    data.pop();
+  } else {
+    splice.call(data, index, 1);
+  }
+  return true;
+}
+
+/**
+ * Gets the list cache value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf ListCache
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function listCacheGet(key) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  return index < 0 ? undefined : data[index][1];
+}
+
+/**
+ * Checks if a list cache value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf ListCache
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function listCacheHas(key) {
+  return assocIndexOf(this.__data__, key) > -1;
+}
+
+/**
+ * Sets the list cache `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf ListCache
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the list cache instance.
+ */
+function listCacheSet(key, value) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  if (index < 0) {
+    data.push([key, value]);
+  } else {
+    data[index][1] = value;
+  }
+  return this;
+}
+
+// Add methods to `ListCache`.
+ListCache.prototype.clear = listCacheClear;
+ListCache.prototype['delete'] = listCacheDelete;
+ListCache.prototype.get = listCacheGet;
+ListCache.prototype.has = listCacheHas;
+ListCache.prototype.set = listCacheSet;
+
+/**
+ * Creates a map cache object to store key-value pairs.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function MapCache(entries) {
+  var index = -1,
+      length = entries ? entries.length : 0;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the map.
+ *
+ * @private
+ * @name clear
+ * @memberOf MapCache
+ */
+function mapCacheClear() {
+  this.__data__ = {
+    'hash': new Hash,
+    'map': new (Map || ListCache),
+    'string': new Hash
+  };
+}
+
+/**
+ * Removes `key` and its value from the map.
+ *
+ * @private
+ * @name delete
+ * @memberOf MapCache
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function mapCacheDelete(key) {
+  return getMapData(this, key)['delete'](key);
+}
+
+/**
+ * Gets the map value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf MapCache
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function mapCacheGet(key) {
+  return getMapData(this, key).get(key);
+}
+
+/**
+ * Checks if a map value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf MapCache
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function mapCacheHas(key) {
+  return getMapData(this, key).has(key);
+}
+
+/**
+ * Sets the map `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf MapCache
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the map cache instance.
+ */
+function mapCacheSet(key, value) {
+  getMapData(this, key).set(key, value);
+  return this;
+}
+
+// Add methods to `MapCache`.
+MapCache.prototype.clear = mapCacheClear;
+MapCache.prototype['delete'] = mapCacheDelete;
+MapCache.prototype.get = mapCacheGet;
+MapCache.prototype.has = mapCacheHas;
+MapCache.prototype.set = mapCacheSet;
+
+/**
+ *
+ * Creates an array cache object to store unique values.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [values] The values to cache.
+ */
+function SetCache(values) {
+  var index = -1,
+      length = values ? values.length : 0;
+
+  this.__data__ = new MapCache;
+  while (++index < length) {
+    this.add(values[index]);
+  }
+}
+
+/**
+ * Adds `value` to the array cache.
+ *
+ * @private
+ * @name add
+ * @memberOf SetCache
+ * @alias push
+ * @param {*} value The value to cache.
+ * @returns {Object} Returns the cache instance.
+ */
+function setCacheAdd(value) {
+  this.__data__.set(value, HASH_UNDEFINED);
+  return this;
+}
+
+/**
+ * Checks if `value` is in the array cache.
+ *
+ * @private
+ * @name has
+ * @memberOf SetCache
+ * @param {*} value The value to search for.
+ * @returns {number} Returns `true` if `value` is found, else `false`.
+ */
+function setCacheHas(value) {
+  return this.__data__.has(value);
+}
+
+// Add methods to `SetCache`.
+SetCache.prototype.add = SetCache.prototype.push = setCacheAdd;
+SetCache.prototype.has = setCacheHas;
+
+/**
+ * Creates a stack cache object to store key-value pairs.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function Stack(entries) {
+  this.__data__ = new ListCache(entries);
+}
+
+/**
+ * Removes all key-value entries from the stack.
+ *
+ * @private
+ * @name clear
+ * @memberOf Stack
+ */
+function stackClear() {
+  this.__data__ = new ListCache;
+}
+
+/**
+ * Removes `key` and its value from the stack.
+ *
+ * @private
+ * @name delete
+ * @memberOf Stack
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function stackDelete(key) {
+  return this.__data__['delete'](key);
+}
+
+/**
+ * Gets the stack value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf Stack
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function stackGet(key) {
+  return this.__data__.get(key);
+}
+
+/**
+ * Checks if a stack value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf Stack
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function stackHas(key) {
+  return this.__data__.has(key);
+}
+
+/**
+ * Sets the stack `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf Stack
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the stack cache instance.
+ */
+function stackSet(key, value) {
+  var cache = this.__data__;
+  if (cache instanceof ListCache) {
+    var pairs = cache.__data__;
+    if (!Map || (pairs.length < LARGE_ARRAY_SIZE - 1)) {
+      pairs.push([key, value]);
+      return this;
+    }
+    cache = this.__data__ = new MapCache(pairs);
+  }
+  cache.set(key, value);
+  return this;
+}
+
+// Add methods to `Stack`.
+Stack.prototype.clear = stackClear;
+Stack.prototype['delete'] = stackDelete;
+Stack.prototype.get = stackGet;
+Stack.prototype.has = stackHas;
+Stack.prototype.set = stackSet;
+
+/**
+ * Creates an array of the enumerable property names of the array-like `value`.
+ *
+ * @private
+ * @param {*} value The value to query.
+ * @param {boolean} inherited Specify returning inherited property names.
+ * @returns {Array} Returns the array of property names.
+ */
+function arrayLikeKeys(value, inherited) {
+  // Safari 8.1 makes `arguments.callee` enumerable in strict mode.
+  // Safari 9 makes `arguments.length` enumerable in strict mode.
+  var result = (isArray(value) || isArguments(value))
+    ? baseTimes(value.length, String)
+    : [];
+
+  var length = result.length,
+      skipIndexes = !!length;
+
+  for (var key in value) {
+    if ((inherited || hasOwnProperty.call(value, key)) &&
+        !(skipIndexes && (key == 'length' || isIndex(key, length)))) {
+      result.push(key);
+    }
+  }
+  return result;
+}
+
+/**
+ * Gets the index at which the `key` is found in `array` of key-value pairs.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {*} key The key to search for.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function assocIndexOf(array, key) {
+  var length = array.length;
+  while (length--) {
+    if (eq(array[length][0], key)) {
+      return length;
+    }
+  }
+  return -1;
+}
+
+/**
+ * The base implementation of `_.forEach` without support for iteratee shorthands.
+ *
+ * @private
+ * @param {Array|Object} collection The collection to iterate over.
+ * @param {Function} iteratee The function invoked per iteration.
+ * @returns {Array|Object} Returns `collection`.
+ */
+var baseEach = createBaseEach(baseForOwn);
+
+/**
+ * The base implementation of `baseForOwn` which iterates over `object`
+ * properties returned by `keysFunc` and invokes `iteratee` for each property.
+ * Iteratee functions may exit iteration early by explicitly returning `false`.
+ *
+ * @private
+ * @param {Object} object The object to iterate over.
+ * @param {Function} iteratee The function invoked per iteration.
+ * @param {Function} keysFunc The function to get the keys of `object`.
+ * @returns {Object} Returns `object`.
+ */
+var baseFor = createBaseFor();
+
+/**
+ * The base implementation of `_.forOwn` without support for iteratee shorthands.
+ *
+ * @private
+ * @param {Object} object The object to iterate over.
+ * @param {Function} iteratee The function invoked per iteration.
+ * @returns {Object} Returns `object`.
+ */
+function baseForOwn(object, iteratee) {
+  return object && baseFor(object, iteratee, keys);
+}
+
+/**
+ * The base implementation of `_.get` without support for default values.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {Array|string} path The path of the property to get.
+ * @returns {*} Returns the resolved value.
+ */
+function baseGet(object, path) {
+  path = isKey(path, object) ? [path] : castPath(path);
+
+  var index = 0,
+      length = path.length;
+
+  while (object != null && index < length) {
+    object = object[toKey(path[index++])];
+  }
+  return (index && index == length) ? object : undefined;
+}
+
+/**
+ * The base implementation of `getTag`.
+ *
+ * @private
+ * @param {*} value The value to query.
+ * @returns {string} Returns the `toStringTag`.
+ */
+function baseGetTag(value) {
+  return objectToString.call(value);
+}
+
+/**
+ * The base implementation of `_.hasIn` without support for deep paths.
+ *
+ * @private
+ * @param {Object} [object] The object to query.
+ * @param {Array|string} key The key to check.
+ * @returns {boolean} Returns `true` if `key` exists, else `false`.
+ */
+function baseHasIn(object, key) {
+  return object != null && key in Object(object);
+}
+
+/**
+ * The base implementation of `_.isEqual` which supports partial comparisons
+ * and tracks traversed objects.
+ *
+ * @private
+ * @param {*} value The value to compare.
+ * @param {*} other The other value to compare.
+ * @param {Function} [customizer] The function to customize comparisons.
+ * @param {boolean} [bitmask] The bitmask of comparison flags.
+ *  The bitmask may be composed of the following flags:
+ *     1 - Unordered comparison
+ *     2 - Partial comparison
+ * @param {Object} [stack] Tracks traversed `value` and `other` objects.
+ * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+ */
+function baseIsEqual(value, other, customizer, bitmask, stack) {
+  if (value === other) {
+    return true;
+  }
+  if (value == null || other == null || (!isObject(value) && !isObjectLike(other))) {
+    return value !== value && other !== other;
+  }
+  return baseIsEqualDeep(value, other, baseIsEqual, customizer, bitmask, stack);
+}
+
+/**
+ * A specialized version of `baseIsEqual` for arrays and objects which performs
+ * deep comparisons and tracks traversed objects enabling objects with circular
+ * references to be compared.
+ *
+ * @private
+ * @param {Object} object The object to compare.
+ * @param {Object} other The other object to compare.
+ * @param {Function} equalFunc The function to determine equivalents of values.
+ * @param {Function} [customizer] The function to customize comparisons.
+ * @param {number} [bitmask] The bitmask of comparison flags. See `baseIsEqual`
+ *  for more details.
+ * @param {Object} [stack] Tracks traversed `object` and `other` objects.
+ * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
+ */
+function baseIsEqualDeep(object, other, equalFunc, customizer, bitmask, stack) {
+  var objIsArr = isArray(object),
+      othIsArr = isArray(other),
+      objTag = arrayTag,
+      othTag = arrayTag;
+
+  if (!objIsArr) {
+    objTag = getTag(object);
+    objTag = objTag == argsTag ? objectTag : objTag;
+  }
+  if (!othIsArr) {
+    othTag = getTag(other);
+    othTag = othTag == argsTag ? objectTag : othTag;
+  }
+  var objIsObj = objTag == objectTag && !isHostObject(object),
+      othIsObj = othTag == objectTag && !isHostObject(other),
+      isSameTag = objTag == othTag;
+
+  if (isSameTag && !objIsObj) {
+    stack || (stack = new Stack);
+    return (objIsArr || isTypedArray(object))
+      ? equalArrays(object, other, equalFunc, customizer, bitmask, stack)
+      : equalByTag(object, other, objTag, equalFunc, customizer, bitmask, stack);
+  }
+  if (!(bitmask & PARTIAL_COMPARE_FLAG)) {
+    var objIsWrapped = objIsObj && hasOwnProperty.call(object, '__wrapped__'),
+        othIsWrapped = othIsObj && hasOwnProperty.call(other, '__wrapped__');
+
+    if (objIsWrapped || othIsWrapped) {
+      var objUnwrapped = objIsWrapped ? object.value() : object,
+          othUnwrapped = othIsWrapped ? other.value() : other;
+
+      stack || (stack = new Stack);
+      return equalFunc(objUnwrapped, othUnwrapped, customizer, bitmask, stack);
+    }
+  }
+  if (!isSameTag) {
+    return false;
+  }
+  stack || (stack = new Stack);
+  return equalObjects(object, other, equalFunc, customizer, bitmask, stack);
+}
+
+/**
+ * The base implementation of `_.isMatch` without support for iteratee shorthands.
+ *
+ * @private
+ * @param {Object} object The object to inspect.
+ * @param {Object} source The object of property values to match.
+ * @param {Array} matchData The property names, values, and compare flags to match.
+ * @param {Function} [customizer] The function to customize comparisons.
+ * @returns {boolean} Returns `true` if `object` is a match, else `false`.
+ */
+function baseIsMatch(object, source, matchData, customizer) {
+  var index = matchData.length,
+      length = index,
+      noCustomizer = !customizer;
+
+  if (object == null) {
+    return !length;
+  }
+  object = Object(object);
+  while (index--) {
+    var data = matchData[index];
+    if ((noCustomizer && data[2])
+          ? data[1] !== object[data[0]]
+          : !(data[0] in object)
+        ) {
+      return false;
+    }
+  }
+  while (++index < length) {
+    data = matchData[index];
+    var key = data[0],
+        objValue = object[key],
+        srcValue = data[1];
+
+    if (noCustomizer && data[2]) {
+      if (objValue === undefined && !(key in object)) {
+        return false;
+      }
+    } else {
+      var stack = new Stack;
+      if (customizer) {
+        var result = customizer(objValue, srcValue, key, object, source, stack);
+      }
+      if (!(result === undefined
+            ? baseIsEqual(srcValue, objValue, customizer, UNORDERED_COMPARE_FLAG | PARTIAL_COMPARE_FLAG, stack)
+            : result
+          )) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+/**
+ * The base implementation of `_.isNative` without bad shim checks.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a native function,
+ *  else `false`.
+ */
+function baseIsNative(value) {
+  if (!isObject(value) || isMasked(value)) {
+    return false;
+  }
+  var pattern = (isFunction(value) || isHostObject(value)) ? reIsNative : reIsHostCtor;
+  return pattern.test(toSource(value));
+}
+
+/**
+ * The base implementation of `_.isTypedArray` without Node.js optimizations.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a typed array, else `false`.
+ */
+function baseIsTypedArray(value) {
+  return isObjectLike(value) &&
+    isLength(value.length) && !!typedArrayTags[objectToString.call(value)];
+}
+
+/**
+ * The base implementation of `_.iteratee`.
+ *
+ * @private
+ * @param {*} [value=_.identity] The value to convert to an iteratee.
+ * @returns {Function} Returns the iteratee.
+ */
+function baseIteratee(value) {
+  // Don't store the `typeof` result in a variable to avoid a JIT bug in Safari 9.
+  // See https://bugs.webkit.org/show_bug.cgi?id=156034 for more details.
+  if (typeof value == 'function') {
+    return value;
+  }
+  if (value == null) {
+    return identity;
+  }
+  if (typeof value == 'object') {
+    return isArray(value)
+      ? baseMatchesProperty(value[0], value[1])
+      : baseMatches(value);
+  }
+  return property(value);
+}
+
+/**
+ * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of property names.
+ */
+function baseKeys(object) {
+  if (!isPrototype(object)) {
+    return nativeKeys(object);
+  }
+  var result = [];
+  for (var key in Object(object)) {
+    if (hasOwnProperty.call(object, key) && key != 'constructor') {
+      result.push(key);
+    }
+  }
+  return result;
+}
+
+/**
+ * The base implementation of `_.matches` which doesn't clone `source`.
+ *
+ * @private
+ * @param {Object} source The object of property values to match.
+ * @returns {Function} Returns the new spec function.
+ */
+function baseMatches(source) {
+  var matchData = getMatchData(source);
+  if (matchData.length == 1 && matchData[0][2]) {
+    return matchesStrictComparable(matchData[0][0], matchData[0][1]);
+  }
+  return function(object) {
+    return object === source || baseIsMatch(object, source, matchData);
+  };
+}
+
+/**
+ * The base implementation of `_.matchesProperty` which doesn't clone `srcValue`.
+ *
+ * @private
+ * @param {string} path The path of the property to get.
+ * @param {*} srcValue The value to match.
+ * @returns {Function} Returns the new spec function.
+ */
+function baseMatchesProperty(path, srcValue) {
+  if (isKey(path) && isStrictComparable(srcValue)) {
+    return matchesStrictComparable(toKey(path), srcValue);
+  }
+  return function(object) {
+    var objValue = get(object, path);
+    return (objValue === undefined && objValue === srcValue)
+      ? hasIn(object, path)
+      : baseIsEqual(srcValue, objValue, undefined, UNORDERED_COMPARE_FLAG | PARTIAL_COMPARE_FLAG);
+  };
+}
+
+/**
+ * A specialized version of `baseProperty` which supports deep paths.
+ *
+ * @private
+ * @param {Array|string} path The path of the property to get.
+ * @returns {Function} Returns the new accessor function.
+ */
+function basePropertyDeep(path) {
+  return function(object) {
+    return baseGet(object, path);
+  };
+}
+
+/**
+ * The base implementation of `_.some` without support for iteratee shorthands.
+ *
+ * @private
+ * @param {Array|Object} collection The collection to iterate over.
+ * @param {Function} predicate The function invoked per iteration.
+ * @returns {boolean} Returns `true` if any element passes the predicate check,
+ *  else `false`.
+ */
+function baseSome(collection, predicate) {
+  var result;
+
+  baseEach(collection, function(value, index, collection) {
+    result = predicate(value, index, collection);
+    return !result;
+  });
+  return !!result;
+}
+
+/**
+ * The base implementation of `_.toString` which doesn't convert nullish
+ * values to empty strings.
+ *
+ * @private
+ * @param {*} value The value to process.
+ * @returns {string} Returns the string.
+ */
+function baseToString(value) {
+  // Exit early for strings to avoid a performance hit in some environments.
+  if (typeof value == 'string') {
+    return value;
+  }
+  if (isSymbol(value)) {
+    return symbolToString ? symbolToString.call(value) : '';
+  }
+  var result = (value + '');
+  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
+}
+
+/**
+ * Casts `value` to a path array if it's not one.
+ *
+ * @private
+ * @param {*} value The value to inspect.
+ * @returns {Array} Returns the cast property path array.
+ */
+function castPath(value) {
+  return isArray(value) ? value : stringToPath(value);
+}
+
+/**
+ * Creates a `baseEach` or `baseEachRight` function.
+ *
+ * @private
+ * @param {Function} eachFunc The function to iterate over a collection.
+ * @param {boolean} [fromRight] Specify iterating from right to left.
+ * @returns {Function} Returns the new base function.
+ */
+function createBaseEach(eachFunc, fromRight) {
+  return function(collection, iteratee) {
+    if (collection == null) {
+      return collection;
+    }
+    if (!isArrayLike(collection)) {
+      return eachFunc(collection, iteratee);
+    }
+    var length = collection.length,
+        index = fromRight ? length : -1,
+        iterable = Object(collection);
+
+    while ((fromRight ? index-- : ++index < length)) {
+      if (iteratee(iterable[index], index, iterable) === false) {
+        break;
+      }
+    }
+    return collection;
+  };
+}
+
+/**
+ * Creates a base function for methods like `_.forIn` and `_.forOwn`.
+ *
+ * @private
+ * @param {boolean} [fromRight] Specify iterating from right to left.
+ * @returns {Function} Returns the new base function.
+ */
+function createBaseFor(fromRight) {
+  return function(object, iteratee, keysFunc) {
+    var index = -1,
+        iterable = Object(object),
+        props = keysFunc(object),
+        length = props.length;
+
+    while (length--) {
+      var key = props[fromRight ? length : ++index];
+      if (iteratee(iterable[key], key, iterable) === false) {
+        break;
+      }
+    }
+    return object;
+  };
+}
+
+/**
+ * A specialized version of `baseIsEqualDeep` for arrays with support for
+ * partial deep comparisons.
+ *
+ * @private
+ * @param {Array} array The array to compare.
+ * @param {Array} other The other array to compare.
+ * @param {Function} equalFunc The function to determine equivalents of values.
+ * @param {Function} customizer The function to customize comparisons.
+ * @param {number} bitmask The bitmask of comparison flags. See `baseIsEqual`
+ *  for more details.
+ * @param {Object} stack Tracks traversed `array` and `other` objects.
+ * @returns {boolean} Returns `true` if the arrays are equivalent, else `false`.
+ */
+function equalArrays(array, other, equalFunc, customizer, bitmask, stack) {
+  var isPartial = bitmask & PARTIAL_COMPARE_FLAG,
+      arrLength = array.length,
+      othLength = other.length;
+
+  if (arrLength != othLength && !(isPartial && othLength > arrLength)) {
+    return false;
+  }
+  // Assume cyclic values are equal.
+  var stacked = stack.get(array);
+  if (stacked && stack.get(other)) {
+    return stacked == other;
+  }
+  var index = -1,
+      result = true,
+      seen = (bitmask & UNORDERED_COMPARE_FLAG) ? new SetCache : undefined;
+
+  stack.set(array, other);
+  stack.set(other, array);
+
+  // Ignore non-index properties.
+  while (++index < arrLength) {
+    var arrValue = array[index],
+        othValue = other[index];
+
+    if (customizer) {
+      var compared = isPartial
+        ? customizer(othValue, arrValue, index, other, array, stack)
+        : customizer(arrValue, othValue, index, array, other, stack);
+    }
+    if (compared !== undefined) {
+      if (compared) {
+        continue;
+      }
+      result = false;
+      break;
+    }
+    // Recursively compare arrays (susceptible to call stack limits).
+    if (seen) {
+      if (!arraySome(other, function(othValue, othIndex) {
+            if (!seen.has(othIndex) &&
+                (arrValue === othValue || equalFunc(arrValue, othValue, customizer, bitmask, stack))) {
+              return seen.add(othIndex);
+            }
+          })) {
+        result = false;
+        break;
+      }
+    } else if (!(
+          arrValue === othValue ||
+            equalFunc(arrValue, othValue, customizer, bitmask, stack)
+        )) {
+      result = false;
+      break;
+    }
+  }
+  stack['delete'](array);
+  stack['delete'](other);
+  return result;
+}
+
+/**
+ * A specialized version of `baseIsEqualDeep` for comparing objects of
+ * the same `toStringTag`.
+ *
+ * **Note:** This function only supports comparing values with tags of
+ * `Boolean`, `Date`, `Error`, `Number`, `RegExp`, or `String`.
+ *
+ * @private
+ * @param {Object} object The object to compare.
+ * @param {Object} other The other object to compare.
+ * @param {string} tag The `toStringTag` of the objects to compare.
+ * @param {Function} equalFunc The function to determine equivalents of values.
+ * @param {Function} customizer The function to customize comparisons.
+ * @param {number} bitmask The bitmask of comparison flags. See `baseIsEqual`
+ *  for more details.
+ * @param {Object} stack Tracks traversed `object` and `other` objects.
+ * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
+ */
+function equalByTag(object, other, tag, equalFunc, customizer, bitmask, stack) {
+  switch (tag) {
+    case dataViewTag:
+      if ((object.byteLength != other.byteLength) ||
+          (object.byteOffset != other.byteOffset)) {
+        return false;
+      }
+      object = object.buffer;
+      other = other.buffer;
+
+    case arrayBufferTag:
+      if ((object.byteLength != other.byteLength) ||
+          !equalFunc(new Uint8Array(object), new Uint8Array(other))) {
+        return false;
+      }
+      return true;
+
+    case boolTag:
+    case dateTag:
+    case numberTag:
+      // Coerce booleans to `1` or `0` and dates to milliseconds.
+      // Invalid dates are coerced to `NaN`.
+      return eq(+object, +other);
+
+    case errorTag:
+      return object.name == other.name && object.message == other.message;
+
+    case regexpTag:
+    case stringTag:
+      // Coerce regexes to strings and treat strings, primitives and objects,
+      // as equal. See http://www.ecma-international.org/ecma-262/7.0/#sec-regexp.prototype.tostring
+      // for more details.
+      return object == (other + '');
+
+    case mapTag:
+      var convert = mapToArray;
+
+    case setTag:
+      var isPartial = bitmask & PARTIAL_COMPARE_FLAG;
+      convert || (convert = setToArray);
+
+      if (object.size != other.size && !isPartial) {
+        return false;
+      }
+      // Assume cyclic values are equal.
+      var stacked = stack.get(object);
+      if (stacked) {
+        return stacked == other;
+      }
+      bitmask |= UNORDERED_COMPARE_FLAG;
+
+      // Recursively compare objects (susceptible to call stack limits).
+      stack.set(object, other);
+      var result = equalArrays(convert(object), convert(other), equalFunc, customizer, bitmask, stack);
+      stack['delete'](object);
+      return result;
+
+    case symbolTag:
+      if (symbolValueOf) {
+        return symbolValueOf.call(object) == symbolValueOf.call(other);
+      }
+  }
+  return false;
+}
+
+/**
+ * A specialized version of `baseIsEqualDeep` for objects with support for
+ * partial deep comparisons.
+ *
+ * @private
+ * @param {Object} object The object to compare.
+ * @param {Object} other The other object to compare.
+ * @param {Function} equalFunc The function to determine equivalents of values.
+ * @param {Function} customizer The function to customize comparisons.
+ * @param {number} bitmask The bitmask of comparison flags. See `baseIsEqual`
+ *  for more details.
+ * @param {Object} stack Tracks traversed `object` and `other` objects.
+ * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
+ */
+function equalObjects(object, other, equalFunc, customizer, bitmask, stack) {
+  var isPartial = bitmask & PARTIAL_COMPARE_FLAG,
+      objProps = keys(object),
+      objLength = objProps.length,
+      othProps = keys(other),
+      othLength = othProps.length;
+
+  if (objLength != othLength && !isPartial) {
+    return false;
+  }
+  var index = objLength;
+  while (index--) {
+    var key = objProps[index];
+    if (!(isPartial ? key in other : hasOwnProperty.call(other, key))) {
+      return false;
+    }
+  }
+  // Assume cyclic values are equal.
+  var stacked = stack.get(object);
+  if (stacked && stack.get(other)) {
+    return stacked == other;
+  }
+  var result = true;
+  stack.set(object, other);
+  stack.set(other, object);
+
+  var skipCtor = isPartial;
+  while (++index < objLength) {
+    key = objProps[index];
+    var objValue = object[key],
+        othValue = other[key];
+
+    if (customizer) {
+      var compared = isPartial
+        ? customizer(othValue, objValue, key, other, object, stack)
+        : customizer(objValue, othValue, key, object, other, stack);
+    }
+    // Recursively compare objects (susceptible to call stack limits).
+    if (!(compared === undefined
+          ? (objValue === othValue || equalFunc(objValue, othValue, customizer, bitmask, stack))
+          : compared
+        )) {
+      result = false;
+      break;
+    }
+    skipCtor || (skipCtor = key == 'constructor');
+  }
+  if (result && !skipCtor) {
+    var objCtor = object.constructor,
+        othCtor = other.constructor;
+
+    // Non `Object` object instances with different constructors are not equal.
+    if (objCtor != othCtor &&
+        ('constructor' in object && 'constructor' in other) &&
+        !(typeof objCtor == 'function' && objCtor instanceof objCtor &&
+          typeof othCtor == 'function' && othCtor instanceof othCtor)) {
+      result = false;
+    }
+  }
+  stack['delete'](object);
+  stack['delete'](other);
+  return result;
+}
+
+/**
+ * Gets the data for `map`.
+ *
+ * @private
+ * @param {Object} map The map to query.
+ * @param {string} key The reference key.
+ * @returns {*} Returns the map data.
+ */
+function getMapData(map, key) {
+  var data = map.__data__;
+  return isKeyable(key)
+    ? data[typeof key == 'string' ? 'string' : 'hash']
+    : data.map;
+}
+
+/**
+ * Gets the property names, values, and compare flags of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the match data of `object`.
+ */
+function getMatchData(object) {
+  var result = keys(object),
+      length = result.length;
+
+  while (length--) {
+    var key = result[length],
+        value = object[key];
+
+    result[length] = [key, value, isStrictComparable(value)];
+  }
+  return result;
+}
+
+/**
+ * Gets the native function at `key` of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {string} key The key of the method to get.
+ * @returns {*} Returns the function if it's native, else `undefined`.
+ */
+function getNative(object, key) {
+  var value = getValue(object, key);
+  return baseIsNative(value) ? value : undefined;
+}
+
+/**
+ * Gets the `toStringTag` of `value`.
+ *
+ * @private
+ * @param {*} value The value to query.
+ * @returns {string} Returns the `toStringTag`.
+ */
+var getTag = baseGetTag;
+
+// Fallback for data views, maps, sets, and weak maps in IE 11,
+// for data views in Edge < 14, and promises in Node.js.
+if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag) ||
+    (Map && getTag(new Map) != mapTag) ||
+    (Promise && getTag(Promise.resolve()) != promiseTag) ||
+    (Set && getTag(new Set) != setTag) ||
+    (WeakMap && getTag(new WeakMap) != weakMapTag)) {
+  getTag = function(value) {
+    var result = objectToString.call(value),
+        Ctor = result == objectTag ? value.constructor : undefined,
+        ctorString = Ctor ? toSource(Ctor) : undefined;
+
+    if (ctorString) {
+      switch (ctorString) {
+        case dataViewCtorString: return dataViewTag;
+        case mapCtorString: return mapTag;
+        case promiseCtorString: return promiseTag;
+        case setCtorString: return setTag;
+        case weakMapCtorString: return weakMapTag;
+      }
+    }
+    return result;
+  };
+}
+
+/**
+ * Checks if `path` exists on `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {Array|string} path The path to check.
+ * @param {Function} hasFunc The function to check properties.
+ * @returns {boolean} Returns `true` if `path` exists, else `false`.
+ */
+function hasPath(object, path, hasFunc) {
+  path = isKey(path, object) ? [path] : castPath(path);
+
+  var result,
+      index = -1,
+      length = path.length;
+
+  while (++index < length) {
+    var key = toKey(path[index]);
+    if (!(result = object != null && hasFunc(object, key))) {
+      break;
+    }
+    object = object[key];
+  }
+  if (result) {
+    return result;
+  }
+  var length = object ? object.length : 0;
+  return !!length && isLength(length) && isIndex(key, length) &&
+    (isArray(object) || isArguments(object));
+}
+
+/**
+ * Checks if `value` is a valid array-like index.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
+ * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
+ */
+function isIndex(value, length) {
+  length = length == null ? MAX_SAFE_INTEGER : length;
+  return !!length &&
+    (typeof value == 'number' || reIsUint.test(value)) &&
+    (value > -1 && value % 1 == 0 && value < length);
+}
+
+/**
+ * Checks if the given arguments are from an iteratee call.
+ *
+ * @private
+ * @param {*} value The potential iteratee value argument.
+ * @param {*} index The potential iteratee index or key argument.
+ * @param {*} object The potential iteratee object argument.
+ * @returns {boolean} Returns `true` if the arguments are from an iteratee call,
+ *  else `false`.
+ */
+function isIterateeCall(value, index, object) {
+  if (!isObject(object)) {
+    return false;
+  }
+  var type = typeof index;
+  if (type == 'number'
+        ? (isArrayLike(object) && isIndex(index, object.length))
+        : (type == 'string' && index in object)
+      ) {
+    return eq(object[index], value);
+  }
+  return false;
+}
+
+/**
+ * Checks if `value` is a property name and not a property path.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @param {Object} [object] The object to query keys on.
+ * @returns {boolean} Returns `true` if `value` is a property name, else `false`.
+ */
+function isKey(value, object) {
+  if (isArray(value)) {
+    return false;
+  }
+  var type = typeof value;
+  if (type == 'number' || type == 'symbol' || type == 'boolean' ||
+      value == null || isSymbol(value)) {
+    return true;
+  }
+  return reIsPlainProp.test(value) || !reIsDeepProp.test(value) ||
+    (object != null && value in Object(object));
+}
+
+/**
+ * Checks if `value` is suitable for use as unique object key.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is suitable, else `false`.
+ */
+function isKeyable(value) {
+  var type = typeof value;
+  return (type == 'string' || type == 'number' || type == 'symbol' || type == 'boolean')
+    ? (value !== '__proto__')
+    : (value === null);
+}
+
+/**
+ * Checks if `func` has its source masked.
+ *
+ * @private
+ * @param {Function} func The function to check.
+ * @returns {boolean} Returns `true` if `func` is masked, else `false`.
+ */
+function isMasked(func) {
+  return !!maskSrcKey && (maskSrcKey in func);
+}
+
+/**
+ * Checks if `value` is likely a prototype object.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a prototype, else `false`.
+ */
+function isPrototype(value) {
+  var Ctor = value && value.constructor,
+      proto = (typeof Ctor == 'function' && Ctor.prototype) || objectProto;
+
+  return value === proto;
+}
+
+/**
+ * Checks if `value` is suitable for strict equality comparisons, i.e. `===`.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` if suitable for strict
+ *  equality comparisons, else `false`.
+ */
+function isStrictComparable(value) {
+  return value === value && !isObject(value);
+}
+
+/**
+ * A specialized version of `matchesProperty` for source values suitable
+ * for strict equality comparisons, i.e. `===`.
+ *
+ * @private
+ * @param {string} key The key of the property to get.
+ * @param {*} srcValue The value to match.
+ * @returns {Function} Returns the new spec function.
+ */
+function matchesStrictComparable(key, srcValue) {
+  return function(object) {
+    if (object == null) {
+      return false;
+    }
+    return object[key] === srcValue &&
+      (srcValue !== undefined || (key in Object(object)));
+  };
+}
+
+/**
+ * Converts `string` to a property path array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the property path array.
+ */
+var stringToPath = memoize(function(string) {
+  string = toString(string);
+
+  var result = [];
+  if (reLeadingDot.test(string)) {
+    result.push('');
+  }
+  string.replace(rePropName, function(match, number, quote, string) {
+    result.push(quote ? string.replace(reEscapeChar, '$1') : (number || match));
+  });
+  return result;
+});
+
+/**
+ * Converts `value` to a string key if it's not a string or symbol.
+ *
+ * @private
+ * @param {*} value The value to inspect.
+ * @returns {string|symbol} Returns the key.
+ */
+function toKey(value) {
+  if (typeof value == 'string' || isSymbol(value)) {
+    return value;
+  }
+  var result = (value + '');
+  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
+}
+
+/**
+ * Converts `func` to its source code.
+ *
+ * @private
+ * @param {Function} func The function to process.
+ * @returns {string} Returns the source code.
+ */
+function toSource(func) {
+  if (func != null) {
+    try {
+      return funcToString.call(func);
+    } catch (e) {}
+    try {
+      return (func + '');
+    } catch (e) {}
+  }
+  return '';
+}
+
+/**
+ * Checks if `predicate` returns truthy for **any** element of `collection`.
+ * Iteration is stopped once `predicate` returns truthy. The predicate is
+ * invoked with three arguments: (value, index|key, collection).
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Collection
+ * @param {Array|Object} collection The collection to iterate over.
+ * @param {Function} [predicate=_.identity] The function invoked per iteration.
+ * @param- {Object} [guard] Enables use as an iteratee for methods like `_.map`.
+ * @returns {boolean} Returns `true` if any element passes the predicate check,
+ *  else `false`.
+ * @example
+ *
+ * _.some([null, 0, 'yes', false], Boolean);
+ * // => true
+ *
+ * var users = [
+ *   { 'user': 'barney', 'active': true },
+ *   { 'user': 'fred',   'active': false }
+ * ];
+ *
+ * // The `_.matches` iteratee shorthand.
+ * _.some(users, { 'user': 'barney', 'active': false });
+ * // => false
+ *
+ * // The `_.matchesProperty` iteratee shorthand.
+ * _.some(users, ['active', false]);
+ * // => true
+ *
+ * // The `_.property` iteratee shorthand.
+ * _.some(users, 'active');
+ * // => true
+ */
+function some(collection, predicate, guard) {
+  var func = isArray(collection) ? arraySome : baseSome;
+  if (guard && isIterateeCall(collection, predicate, guard)) {
+    predicate = undefined;
+  }
+  return func(collection, baseIteratee(predicate, 3));
+}
+
+/**
+ * Creates a function that memoizes the result of `func`. If `resolver` is
+ * provided, it determines the cache key for storing the result based on the
+ * arguments provided to the memoized function. By default, the first argument
+ * provided to the memoized function is used as the map cache key. The `func`
+ * is invoked with the `this` binding of the memoized function.
+ *
+ * **Note:** The cache is exposed as the `cache` property on the memoized
+ * function. Its creation may be customized by replacing the `_.memoize.Cache`
+ * constructor with one whose instances implement the
+ * [`Map`](http://ecma-international.org/ecma-262/7.0/#sec-properties-of-the-map-prototype-object)
+ * method interface of `delete`, `get`, `has`, and `set`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Function
+ * @param {Function} func The function to have its output memoized.
+ * @param {Function} [resolver] The function to resolve the cache key.
+ * @returns {Function} Returns the new memoized function.
+ * @example
+ *
+ * var object = { 'a': 1, 'b': 2 };
+ * var other = { 'c': 3, 'd': 4 };
+ *
+ * var values = _.memoize(_.values);
+ * values(object);
+ * // => [1, 2]
+ *
+ * values(other);
+ * // => [3, 4]
+ *
+ * object.a = 2;
+ * values(object);
+ * // => [1, 2]
+ *
+ * // Modify the result cache.
+ * values.cache.set(object, ['a', 'b']);
+ * values(object);
+ * // => ['a', 'b']
+ *
+ * // Replace `_.memoize.Cache`.
+ * _.memoize.Cache = WeakMap;
+ */
+function memoize(func, resolver) {
+  if (typeof func != 'function' || (resolver && typeof resolver != 'function')) {
+    throw new TypeError(FUNC_ERROR_TEXT);
+  }
+  var memoized = function() {
+    var args = arguments,
+        key = resolver ? resolver.apply(this, args) : args[0],
+        cache = memoized.cache;
+
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+    var result = func.apply(this, args);
+    memoized.cache = cache.set(key, result);
+    return result;
+  };
+  memoized.cache = new (memoize.Cache || MapCache);
+  return memoized;
+}
+
+// Assign cache to `_.memoize`.
+memoize.Cache = MapCache;
+
+/**
+ * Performs a
+ * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * comparison between two values to determine if they are equivalent.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to compare.
+ * @param {*} other The other value to compare.
+ * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+ * @example
+ *
+ * var object = { 'a': 1 };
+ * var other = { 'a': 1 };
+ *
+ * _.eq(object, object);
+ * // => true
+ *
+ * _.eq(object, other);
+ * // => false
+ *
+ * _.eq('a', 'a');
+ * // => true
+ *
+ * _.eq('a', Object('a'));
+ * // => false
+ *
+ * _.eq(NaN, NaN);
+ * // => true
+ */
+function eq(value, other) {
+  return value === other || (value !== value && other !== other);
+}
+
+/**
+ * Checks if `value` is likely an `arguments` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an `arguments` object,
+ *  else `false`.
+ * @example
+ *
+ * _.isArguments(function() { return arguments; }());
+ * // => true
+ *
+ * _.isArguments([1, 2, 3]);
+ * // => false
+ */
+function isArguments(value) {
+  // Safari 8.1 makes `arguments.callee` enumerable in strict mode.
+  return isArrayLikeObject(value) && hasOwnProperty.call(value, 'callee') &&
+    (!propertyIsEnumerable.call(value, 'callee') || objectToString.call(value) == argsTag);
+}
+
+/**
+ * Checks if `value` is classified as an `Array` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an array, else `false`.
+ * @example
+ *
+ * _.isArray([1, 2, 3]);
+ * // => true
+ *
+ * _.isArray(document.body.children);
+ * // => false
+ *
+ * _.isArray('abc');
+ * // => false
+ *
+ * _.isArray(_.noop);
+ * // => false
+ */
+var isArray = Array.isArray;
+
+/**
+ * Checks if `value` is array-like. A value is considered array-like if it's
+ * not a function and has a `value.length` that's an integer greater than or
+ * equal to `0` and less than or equal to `Number.MAX_SAFE_INTEGER`.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
+ * @example
+ *
+ * _.isArrayLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isArrayLike(document.body.children);
+ * // => true
+ *
+ * _.isArrayLike('abc');
+ * // => true
+ *
+ * _.isArrayLike(_.noop);
+ * // => false
+ */
+function isArrayLike(value) {
+  return value != null && isLength(value.length) && !isFunction(value);
+}
+
+/**
+ * This method is like `_.isArrayLike` except that it also checks if `value`
+ * is an object.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an array-like object,
+ *  else `false`.
+ * @example
+ *
+ * _.isArrayLikeObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isArrayLikeObject(document.body.children);
+ * // => true
+ *
+ * _.isArrayLikeObject('abc');
+ * // => false
+ *
+ * _.isArrayLikeObject(_.noop);
+ * // => false
+ */
+function isArrayLikeObject(value) {
+  return isObjectLike(value) && isArrayLike(value);
+}
+
+/**
+ * Checks if `value` is classified as a `Function` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a function, else `false`.
+ * @example
+ *
+ * _.isFunction(_);
+ * // => true
+ *
+ * _.isFunction(/abc/);
+ * // => false
+ */
+function isFunction(value) {
+  // The use of `Object#toString` avoids issues with the `typeof` operator
+  // in Safari 8-9 which returns 'object' for typed array and other constructors.
+  var tag = isObject(value) ? objectToString.call(value) : '';
+  return tag == funcTag || tag == genTag;
+}
+
+/**
+ * Checks if `value` is a valid array-like length.
+ *
+ * **Note:** This method is loosely based on
+ * [`ToLength`](http://ecma-international.org/ecma-262/7.0/#sec-tolength).
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
+ * @example
+ *
+ * _.isLength(3);
+ * // => true
+ *
+ * _.isLength(Number.MIN_VALUE);
+ * // => false
+ *
+ * _.isLength(Infinity);
+ * // => false
+ *
+ * _.isLength('3');
+ * // => false
+ */
+function isLength(value) {
+  return typeof value == 'number' &&
+    value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
+}
+
+/**
+ * Checks if `value` is the
+ * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+ * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(_.noop);
+ * // => true
+ *
+ * _.isObject(null);
+ * // => false
+ */
+function isObject(value) {
+  var type = typeof value;
+  return !!value && (type == 'object' || type == 'function');
+}
+
+/**
+ * Checks if `value` is object-like. A value is object-like if it's not `null`
+ * and has a `typeof` result of "object".
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ * @example
+ *
+ * _.isObjectLike({});
+ * // => true
+ *
+ * _.isObjectLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isObjectLike(_.noop);
+ * // => false
+ *
+ * _.isObjectLike(null);
+ * // => false
+ */
+function isObjectLike(value) {
+  return !!value && typeof value == 'object';
+}
+
+/**
+ * Checks if `value` is classified as a `Symbol` primitive or object.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+ * @example
+ *
+ * _.isSymbol(Symbol.iterator);
+ * // => true
+ *
+ * _.isSymbol('abc');
+ * // => false
+ */
+function isSymbol(value) {
+  return typeof value == 'symbol' ||
+    (isObjectLike(value) && objectToString.call(value) == symbolTag);
+}
+
+/**
+ * Checks if `value` is classified as a typed array.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a typed array, else `false`.
+ * @example
+ *
+ * _.isTypedArray(new Uint8Array);
+ * // => true
+ *
+ * _.isTypedArray([]);
+ * // => false
+ */
+var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
+
+/**
+ * Converts `value` to a string. An empty string is returned for `null`
+ * and `undefined` values. The sign of `-0` is preserved.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to process.
+ * @returns {string} Returns the string.
+ * @example
+ *
+ * _.toString(null);
+ * // => ''
+ *
+ * _.toString(-0);
+ * // => '-0'
+ *
+ * _.toString([1, 2, 3]);
+ * // => '1,2,3'
+ */
+function toString(value) {
+  return value == null ? '' : baseToString(value);
+}
+
+/**
+ * Gets the value at `path` of `object`. If the resolved value is
+ * `undefined`, the `defaultValue` is returned in its place.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.7.0
+ * @category Object
+ * @param {Object} object The object to query.
+ * @param {Array|string} path The path of the property to get.
+ * @param {*} [defaultValue] The value returned for `undefined` resolved values.
+ * @returns {*} Returns the resolved value.
+ * @example
+ *
+ * var object = { 'a': [{ 'b': { 'c': 3 } }] };
+ *
+ * _.get(object, 'a[0].b.c');
+ * // => 3
+ *
+ * _.get(object, ['a', '0', 'b', 'c']);
+ * // => 3
+ *
+ * _.get(object, 'a.b.c', 'default');
+ * // => 'default'
+ */
+function get(object, path, defaultValue) {
+  var result = object == null ? undefined : baseGet(object, path);
+  return result === undefined ? defaultValue : result;
+}
+
+/**
+ * Checks if `path` is a direct or inherited property of `object`.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Object
+ * @param {Object} object The object to query.
+ * @param {Array|string} path The path to check.
+ * @returns {boolean} Returns `true` if `path` exists, else `false`.
+ * @example
+ *
+ * var object = _.create({ 'a': _.create({ 'b': 2 }) });
+ *
+ * _.hasIn(object, 'a');
+ * // => true
+ *
+ * _.hasIn(object, 'a.b');
+ * // => true
+ *
+ * _.hasIn(object, ['a', 'b']);
+ * // => true
+ *
+ * _.hasIn(object, 'b');
+ * // => false
+ */
+function hasIn(object, path) {
+  return object != null && hasPath(object, path, baseHasIn);
+}
+
+/**
+ * Creates an array of the own enumerable property names of `object`.
+ *
+ * **Note:** Non-object values are coerced to objects. See the
+ * [ES spec](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
+ * for more details.
+ *
+ * @static
+ * @since 0.1.0
+ * @memberOf _
+ * @category Object
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of property names.
+ * @example
+ *
+ * function Foo() {
+ *   this.a = 1;
+ *   this.b = 2;
+ * }
+ *
+ * Foo.prototype.c = 3;
+ *
+ * _.keys(new Foo);
+ * // => ['a', 'b'] (iteration order is not guaranteed)
+ *
+ * _.keys('hi');
+ * // => ['0', '1']
+ */
+function keys(object) {
+  return isArrayLike(object) ? arrayLikeKeys(object) : baseKeys(object);
+}
+
+/**
+ * This method returns the first argument it receives.
+ *
+ * @static
+ * @since 0.1.0
+ * @memberOf _
+ * @category Util
+ * @param {*} value Any value.
+ * @returns {*} Returns `value`.
+ * @example
+ *
+ * var object = { 'a': 1 };
+ *
+ * console.log(_.identity(object) === object);
+ * // => true
+ */
+function identity(value) {
+  return value;
+}
+
+/**
+ * Creates a function that returns the value at `path` of a given object.
+ *
+ * @static
+ * @memberOf _
+ * @since 2.4.0
+ * @category Util
+ * @param {Array|string} path The path of the property to get.
+ * @returns {Function} Returns the new accessor function.
+ * @example
+ *
+ * var objects = [
+ *   { 'a': { 'b': 2 } },
+ *   { 'a': { 'b': 1 } }
+ * ];
+ *
+ * _.map(objects, _.property('a.b'));
+ * // => [2, 1]
+ *
+ * _.map(_.sortBy(objects, _.property(['a', 'b'])), 'a.b');
+ * // => [1, 2]
+ */
+function property(path) {
+  return isKey(path) ? baseProperty(toKey(path)) : basePropertyDeep(path);
+}
+
+module.exports = some;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19), __webpack_require__(20)(module)))
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+"use strict";
+
+module.exports = function (_ref) {
+  var t = _ref.types;
+
+  var isVoid0 = __webpack_require__(29)(t);
+
+  return {
+    name: "minify-flip-comparisons",
+    visitor: {
+      // flip comparisons with a pure right hand value, this ensures
+      // consistency with comparisons and increases the length of
+      // strings that gzip can match
+      // typeof blah === 'function' -> 'function' === typeof blah
+      BinaryExpression: function BinaryExpression(path) {
+        var node = path.node;
+        var right = node.right;
+        var left = node.left;
+
+        // Make sure we have a constant on the right.
+
+        if (!t.isLiteral(right) && !isVoid0(right) && !(t.isUnaryExpression(right) && t.isLiteral(right.argument)) && !t.isObjectExpression(right) && !t.isArrayExpression(right)) {
+          return;
+        }
+
+        // Commutative operators.
+        if (t.EQUALITY_BINARY_OPERATORS.indexOf(node.operator) >= 0 || ["*", "^", "&", "|"].indexOf(node.operator) >= 0) {
+          node.left = right;
+          node.right = left;
+          return;
+        }
+
+        if (t.BOOLEAN_NUMBER_BINARY_OPERATORS.indexOf(node.operator) >= 0) {
+          node.left = right;
+          node.right = left;
+          var operator = void 0;
+          switch (node.operator) {
+            case ">":
+              operator = "<";break;
+            case "<":
+              operator = ">";break;
+            case ">=":
+              operator = "<=";break;
+            case "<=":
+              operator = ">=";break;
+          }
+          node.operator = operator;
+          return;
+        }
+      }
+    }
+  };
+};
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(1);
+
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+"use strict";
+
+module.exports = function (_ref) {
+  var t = _ref.types;
+
+  var flipExpressions = __webpack_require__(31)(t);
+
+  return {
+    name: "minify-guarded-expressions",
+    visitor: {
+      // Convert guarded expressions
+      // !a && b() --> a || b();
+      // This could change the return result of the expression so we only do it
+      // on things where the result is ignored.
+      LogicalExpression: {
+        enter: [function (path) {
+          var node = path.node;
+
+
+          var left = path.get("left");
+          var right = path.get("right");
+
+          // issues - 171, 174, 176
+          // we assume that it is returned/assigned/part of a bigger expression
+          // or utilized somehow
+          // we check if we shouldBail only when evaluating
+          // the rightside of the expression;
+          // if the left side is evaluated to be deterministic,
+          // we can safely replace the entire expression
+          var shouldBail = !path.parentPath.isExpressionStatement();
+
+          if (node.operator === "&&") {
+            var leftTruthy = left.evaluateTruthy();
+            if (leftTruthy === false) {
+              // Short-circuit
+              path.replaceWith(node.left);
+            } else if (leftTruthy === true && left.isPure()) {
+              path.replaceWith(node.right);
+            } else if (right.evaluateTruthy() === false && right.isPure() && !shouldBail) {
+              path.replaceWith(node.left);
+            }
+          } else if (node.operator === "||") {
+            var _leftTruthy = left.evaluateTruthy();
+            if (_leftTruthy === false && left.isPure()) {
+              path.replaceWith(node.right);
+            } else if (_leftTruthy === true) {
+              // Short-circuit
+              path.replaceWith(node.left);
+            } else if (right.evaluateTruthy() === false && right.isPure() && !shouldBail) {
+              path.replaceWith(node.left);
+            }
+          }
+        }, function (path) {
+          var node = path.node;
+
+
+          if (flipExpressions.hasSeen(node)) {
+            return;
+          }
+
+          if (!path.parentPath.isExpressionStatement() && !(path.parentPath.isSequenceExpression() && path.parentPath.parentPath.isExpressionStatement())) {
+            return;
+          }
+
+          // Start counting savings from one since we can ignore the last
+          // expression.
+          if (flipExpressions.shouldFlip(node, 1)) {
+            var newNode = flipExpressions.flip(node, true);
+            path.replaceWith(newNode);
+          }
+        }]
+      }
+    }
+  };
+};
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(0);
+
+
+/***/ },
+/* 32 */
+/***/ function(module, exports) {
+
+"use strict";
+"use strict";
+
+module.exports = function (_ref) {
+  var t = _ref.types;
+
+  var INFINITY = t.binaryExpression("/", t.numericLiteral(1), t.numericLiteral(0));
+  return {
+    name: "minify-infinity",
+    visitor: {
+      // Infinity -> 1 / 0
+      Identifier: function Identifier(path) {
+        if (path.node.name !== "Infinity") {
+          return;
+        }
+
+        // It's a referenced identifier
+        if (path.scope.getBinding("Infinity")) {
+          return;
+        }
+
+        if (path.parentPath.isObjectProperty({ key: path.node })) {
+          return;
+        }
+
+        if (path.parentPath.isMemberExpression()) {
+          return;
+        }
+
+        if (path.isLVal() && !path.parentPath.isExpressionStatement()) {
+          return;
+        }
+
+        path.replaceWith(INFINITY);
+      }
+    }
+  };
+};
+
+/***/ },
+/* 33 */
+/***/ function(module, exports) {
+
+"use strict";
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+module.exports = function (_ref) {
+  var t = _ref.types;
+
+  var hop = Object.prototype.hasOwnProperty;
+
+  var Mangler = function () {
+    function Mangler(charset, program) {
+      var _ref2 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+          _ref2$blacklist = _ref2.blacklist,
+          blacklist = _ref2$blacklist === undefined ? {} : _ref2$blacklist,
+          _ref2$keepFnName = _ref2.keepFnName,
+          keepFnName = _ref2$keepFnName === undefined ? false : _ref2$keepFnName,
+          _ref2$eval = _ref2.eval,
+          _eval = _ref2$eval === undefined ? false : _ref2$eval;
+
+      _classCallCheck(this, Mangler);
+
+      this.charset = charset;
+      this.program = program;
+      this.blacklist = blacklist;
+      this.keepFnName = keepFnName;
+      this.eval = _eval;
+
+      this.unsafeScopes = new Set();
+      this.visitedScopes = new Set();
+
+      this.referencesToUpdate = new Map();
+
+      this.references = new Map();
+    }
+
+    _createClass(Mangler, [{
+      key: "addScope",
+      value: function addScope(scope) {
+        if (!this.references.has(scope)) {
+          this.references.set(scope, new Set());
+        }
+      }
+    }, {
+      key: "addReference",
+      value: function addReference(scope, name) {
+        this.references.get(scope).add(name);
+      }
+    }, {
+      key: "hasReference",
+      value: function hasReference(scope, name) {
+        return this.references.get(scope).has(name);
+      }
+    }, {
+      key: "updateReference",
+      value: function updateReference(scope, oldName, newName) {
+        var references = this.references.get(scope);
+        if (!references.has(oldName)) {
+          // already renamed
+          return;
+        }
+        references.delete(oldName);
+        references.add(newName);
+      }
+    }, {
+      key: "hasBinding",
+      value: function hasBinding(scope, name) {
+        return scope.hasOwnBinding(name) || scope.hasUid(name);
+      }
+    }, {
+      key: "run",
+      value: function run() {
+        this.collect();
+        this.charset.sort();
+        this.mangle();
+      }
+    }, {
+      key: "isBlacklist",
+      value: function isBlacklist(name) {
+        return hop.call(this.blacklist, name);
+      }
+    }, {
+      key: "markUnsafeScopes",
+      value: function markUnsafeScopes(scope) {
+        var evalScope = scope;
+        do {
+          this.unsafeScopes.add(evalScope);
+        } while (evalScope = evalScope.parent);
+      }
+    }, {
+      key: "collect",
+      value: function collect() {
+        var mangler = this;
+
+        mangler.addScope(this.program.scope);
+
+        var collectVisitor = {
+          // capture direct evals
+          CallExpression: function CallExpression(path) {
+            var callee = path.get("callee");
+
+            if (callee.isIdentifier() && callee.node.name === "eval" && !callee.scope.getBinding("eval")) {
+              mangler.markUnsafeScopes(path.scope);
+            }
+          },
+          Scopable: function Scopable(_ref3) {
+            var scope = _ref3.scope;
+
+            mangler.addScope(scope);
+          },
+          ReferencedIdentifier: function ReferencedIdentifier(_ref4) {
+            var scope = _ref4.scope,
+                name = _ref4.node.name;
+
+            mangler.addReference(scope, name);
+          }
+        };
+
+        if (this.charset.shouldConsider) {
+          // charset considerations
+          collectVisitor.Identifier = function Identifier(path) {
+            var node = path.node;
+
+
+            if (path.parentPath.isMemberExpression({ property: node }) || path.parentPath.isObjectProperty({ key: node })) {
+              mangler.charset.consider(node.name);
+            }
+          };
+
+          // charset considerations
+          collectVisitor.Literal = function Literal(_ref5) {
+            var node = _ref5.node;
+
+            mangler.charset.consider(String(node.value));
+          };
+        }
+
+        this.program.traverse(collectVisitor);
+      }
+    }, {
+      key: "mangle",
+      value: function mangle() {
+        var mangler = this;
+
+        this.program.traverse({
+          Scopable: function Scopable(path) {
+            var scope = path.scope;
+
+
+            if (!mangler.eval && mangler.unsafeScopes.has(scope)) return;
+
+            if (mangler.visitedScopes.has(scope)) return;
+            mangler.visitedScopes.add(scope);
+
+            var i = 0;
+            function getNext() {
+              return mangler.charset.getIdentifier(i++);
+            }
+
+            // This is useful when we have vars of single character
+            // => var a, ...z, A, ...Z, $, _;
+            // to
+            // => var aa, a, b ,c;
+            // instead of
+            // => var aa, ab, ...;
+            // TODO:
+            // Re-enable after enabling this feature
+            // This doesn't work right now as we are concentrating
+            // on performance improvements
+            function resetNext() {
+              i = 0;
+            }
+
+            var bindings = scope.bindings;
+            var names = Object.keys(bindings);
+
+            for (var _i = 0; _i < names.length; _i++) {
+              var oldName = names[_i];
+              var binding = bindings[oldName];
+
+              if (
+              // already renamed bindings
+              binding.renamed
+              // arguments
+              || oldName === "arguments"
+              // globals
+              || mangler.program.scope.bindings[oldName] === binding
+              // other scope bindings
+              || !scope.hasOwnBinding(oldName)
+              // labels
+              || binding.path.isLabeledStatement()
+              // blacklisted
+              || mangler.isBlacklist(oldName)
+              // function names
+              || (mangler.keepFnName ? isFunction(binding.path) : false)) {
+                continue;
+              }
+
+              var next = void 0;
+              do {
+                next = getNext();
+              } while (!t.isValidIdentifier(next) || scope.hasBinding(next) || scope.hasGlobal(next) || mangler.hasReference(scope, next));
+
+              // TODO:
+              // re-enable this - check above
+              resetNext();
+              mangler.rename(scope, binding, oldName, next);
+              mangler.updateReference(scope, oldName, next);
+              // mark the binding as renamed
+              binding.renamed = true;
+            }
+          }
+        });
+
+        // TODO:
+        // re-enable
+        // check above
+        // this.updateReferences();
+      }
+    }, {
+      key: "rename",
+      value: function rename(scope, binding, oldName, newName) {
+        var mangler = this;
+
+        // rename at the declaration level
+        binding.identifier.name = newName;
+
+        var bindings = scope.bindings;
+
+        bindings[newName] = binding;
+        delete bindings[oldName];
+
+        // update all constant violations & redeclarations
+        var violations = binding.constantViolations;
+
+        var _loop = function _loop(i) {
+          if (violations[i].isLabeledStatement()) return "continue";
+
+          var bindings = violations[i].getBindingIdentifiers();
+          Object.keys(bindings).map(function (b) {
+            bindings[b].name = newName;
+          });
+        };
+
+        for (var i = 0; i < violations.length; i++) {
+          var _ret = _loop(i);
+
+          if (_ret === "continue") continue;
+        }
+
+        // update all referenced places
+        var refs = binding.referencePaths;
+        for (var _i2 = 0; _i2 < refs.length; _i2++) {
+          var path = refs[_i2];
+          var node = path.node;
+
+          if (!path.isIdentifier()) {
+            // Ideally, this should not happen
+            // it happens in these places now -
+            // case 1: Export Statements
+            // This is a bug in babel
+            // https://github.com/babel/babel/pull/3629
+            // case 2: Replacements in other plugins
+            // eg: https://github.com/babel/babili/issues/122
+            // replacement in dce from `x` to `!x` gives referencePath as `!x`
+            path.traverse({
+              ReferencedIdentifier: function ReferencedIdentifier(refPath) {
+                if (refPath.node.name === oldName && refPath.scope === scope) {
+                  refPath.node.name = newName;
+                  mangler.updateReference(refPath.scope, oldName, newName);
+                }
+              }
+            });
+          } else if (!isLabelIdentifier(path)) {
+            node.name = newName;
+            mangler.updateReference(path.scope, oldName, newName);
+          }
+        }
+      }
+    }]);
+
+    return Mangler;
+  }();
+
+  return {
+    name: "minify-mangle-names",
+    visitor: {
+      Program: function Program(path) {
+        // If the source code is small then we're going to assume that the user
+        // is running on this on single files before bundling. Therefore we
+        // need to achieve as much determinisim and we will not do any frequency
+        // sorting on the character set. Currently the number is pretty arbitrary.
+        var shouldConsiderSource = path.getSource().length > 70000;
+
+        var charset = new Charset(shouldConsiderSource);
+
+        var mangler = new Mangler(charset, path, this.opts);
+        mangler.run();
+      }
+    }
+  };
+};
+
+var CHARSET = ("abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ$_").split("");
+
+var Charset = function () {
+  function Charset(shouldConsider) {
+    var _this = this;
+
+    _classCallCheck(this, Charset);
+
+    this.shouldConsider = shouldConsider;
+    this.chars = CHARSET.slice();
+    this.frequency = {};
+    this.chars.forEach(function (c) {
+      _this.frequency[c] = 0;
+    });
+    this.finalized = false;
+  }
+
+  _createClass(Charset, [{
+    key: "consider",
+    value: function consider(str) {
+      var _this2 = this;
+
+      if (!this.shouldConsider) {
+        return;
+      }
+
+      str.split("").forEach(function (c) {
+        if (_this2.frequency[c] != null) {
+          _this2.frequency[c]++;
+        }
+      });
+    }
+  }, {
+    key: "sort",
+    value: function sort() {
+      var _this3 = this;
+
+      if (this.shouldConsider) {
+        this.chars = this.chars.sort(function (a, b) {
+          return _this3.frequency[b] - _this3.frequency[a];
+        });
+      }
+
+      this.finalized = true;
+    }
+  }, {
+    key: "getIdentifier",
+    value: function getIdentifier(num) {
+      if (!this.finalized) {
+        throw new Error("Should sort first");
+      }
+
+      var ret = "";
+      num++;
+      do {
+        num--;
+        ret += this.chars[num % this.chars.length];
+        num = Math.floor(num / this.chars.length);
+      } while (num > 0);
+      return ret;
+    }
+  }]);
+
+  return Charset;
+}();
+
+// for keepFnName
+
+
+function isFunction(path) {
+  return path.isFunctionExpression() || path.isFunctionDeclaration() || path.isClassExpression() || path.isClassDeclaration();
+}
+
+function isLabelIdentifier(path) {
+  var node = path.node;
+
+  return path.parentPath.isLabeledStatement({ label: node }) || path.parentPath.isBreakStatement({ label: node }) || path.parentPath.isContinueStatement({ label: node });
+}
+
+/***/ },
+/* 34 */
+/***/ function(module, exports) {
+
+"use strict";
+"use strict";
+
+module.exports = function (_ref) {
+  var t = _ref.types;
+
+  return {
+    name: "minify-numeric-literals",
+    visitor: {
+      NumericLiteral: function NumericLiteral(path) {
+        if (!path.node.extra) return;
+
+        var exponential = path.node.value.toExponential().replace(/\+/g, "").replace(/e0/, "");
+
+        if (path.node.extra.raw.length > exponential.length) {
+          var literal = t.numericLiteral(path.node.value);
+          literal.extra = {
+            raw: exponential,
+            rawValue: path.node.value
+          };
+          path.replaceWith(literal);
+        }
+      }
+    }
+  };
+};
+
+/***/ },
+/* 35 */
+/***/ function(module, exports) {
+
+"use strict";
+"use strict";
+
+module.exports = function (_ref) {
+  var t = _ref.types;
+
+  var NO_MEMBER = Symbol("no member");
+
+  var replaceVisitor = {
+    ReferencedIdentifier: function ReferencedIdentifier(path) {
+      var _path = path;
+      var node = _path.node;
+
+      var optionsMap = this.replacements[node.name];
+      if (!optionsMap) {
+        return;
+      }
+
+      var options = void 0;
+      if (path.parentPath.isMemberExpression({ object: node })) {
+        var property = path.parent.property;
+
+        var key = t.isIdentifier(property) && property.name;
+        if (typeof key === "string") {
+          options = optionsMap[key];
+          path = path.parentPath;
+        }
+      }
+
+      if (!options) {
+        options = optionsMap[NO_MEMBER];
+      }
+
+      if (!options) {
+        return;
+      }
+
+      path.replaceWith(options.node);
+    }
+  };
+
+  return {
+    name: "minify-replace",
+    visitor: {
+      Program: function Program(path) {
+        /**
+           Replacements is an array of objects like this:
+           {
+             identifierName: 'console',
+             member: 'log', // optional
+             replacement: {
+               type: 'identifier',
+               value: '',
+             },
+           }
+        **/
+
+        if (!this.opts.replacements) {
+          // No replacements. Bail.
+          return;
+        }
+
+        var map = Object.create(null);
+        this.opts.replacements.forEach(function (_ref2) {
+          var identifierName = _ref2.identifierName;
+          var replacement = _ref2.replacement;
+          var member = _ref2.member;
+
+          if (path.scope.globals[identifierName]) {
+            // Convert to a node, we only allow identifiers and literals as replacements
+            if (!replacement.type.match(/literal|identifier/i)) {
+              throw new Error("Only literals and identifier are supported as replacements");
+            }
+
+            var node = t[replacement.type](replacement.value);
+            var options = {
+              identifierName: identifierName,
+              node: node,
+              member: member
+            };
+
+            if (!map[identifierName]) {
+              map[identifierName] = {};
+            }
+
+            if (member && map[identifierName][member]) {
+              throw new Error("Replacement collision " + identifierName + "." + member);
+            }
+            map[identifierName][member || NO_MEMBER] = options;
+          }
+        });
+
+        path.traverse(replaceVisitor, { replacements: map });
+      }
+    }
+  };
+};
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+"use strict";
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var PatternMatch = __webpack_require__(37);
+
+module.exports = function (_ref) {
+  var t = _ref.types;
+
+  var isNodesEquiv = __webpack_require__(39)(t);
+  var flipExpressions = __webpack_require__(38)(t);
+  var toMultipleSequenceExpressions = __webpack_require__(40)(t);
+
+  var VOID_0 = t.unaryExpression("void", t.numericLiteral(0), true);
+  var condExprSeen = Symbol("condExprSeen");
+  var seqExprSeen = Symbol("seqExprSeen");
+  var shouldRevisit = Symbol("shouldRevisit");
+
+  // Types as symbols for comparisions
+  var types = {};
+  t.TYPES.forEach(function (type) {
+    types[type] = Symbol.for(type);
+  });
+  var isNodeOfType = function isNodeOfType(node, typeSymbol) {
+    if ((typeof typeSymbol === "undefined" ? "undefined" : _typeof(typeSymbol)) !== "symbol") return false;
+    return t["is" + Symbol.keyFor(typeSymbol)](node);
+  };
+
+  // small abstractions
+  var not = function not(node) {
+    return t.unaryExpression("!", node);
+  };
+  var notnot = function notnot(node) {
+    return not(not(node));
+  };
+  var or = function or(a, b) {
+    return t.logicalExpression("||", a, b);
+  };
+  var and = function and(a, b) {
+    return t.logicalExpression("&&", a, b);
+  };
+
+  return {
+    name: "minify-simplify",
+    visitor: {
+      Statement: {
+        exit: function exit(path) {
+          if (path.node[shouldRevisit]) {
+            delete path.node[shouldRevisit];
+            path.visit();
+          }
+        }
+      },
+
+      // CallExpression(path) {
+      // const { node } = path;
+
+      /* (function() {})() -> !function() {}()
+      There is a bug in babel in printing this. Disabling for now.
+      if (t.isFunctionExpression(node.callee) &&
+          (t.isExpressionStatement(parent) ||
+           (t.isSequenceExpression(parent) && parent.expressions[0] === node))
+      ) {
+        path.replaceWith(
+          t.callExpression(
+            t.unaryExpression("!", node.callee, true),
+            node.arguments
+          )
+        );
+        return;
+      }*/
+      // },
+
+      UnaryExpression: {
+        enter: [
+
+        // Demorgans.
+        function (path) {
+          var node = path.node;
+
+
+          if (node.operator !== "!" || flipExpressions.hasSeen(node)) {
+            return;
+          }
+
+          var expr = node.argument;
+
+          // We need to make sure that the return type will always be boolean.
+          if (!(t.isLogicalExpression(expr) || t.isConditionalExpression(expr) || t.isBinaryExpression(expr))) {
+            return;
+          }
+          if (t.isBinaryExpression(expr) && t.COMPARISON_BINARY_OPERATORS.indexOf(expr.operator) === -1) {
+            return;
+          }
+
+          if (flipExpressions.shouldFlip(expr, 1)) {
+            var newNode = flipExpressions.flip(expr);
+            path.replaceWith(newNode);
+          }
+        },
+
+        // !(a, b, c) -> a, b, !c
+        function (path) {
+          var node = path.node;
+
+
+          if (node.operator !== "!") {
+            return;
+          }
+
+          if (!t.isSequenceExpression(node.argument)) {
+            return;
+          }
+
+          var seq = node.argument.expressions;
+          var expr = seq[seq.length - 1];
+          seq[seq.length - 1] = t.unaryExpression("!", expr, true);
+          path.replaceWith(node.argument);
+        },
+
+        // !(a ? b : c) -> a ? !b : !c
+        function (path) {
+          var node = path.node;
+
+
+          if (node.operator !== "!") {
+            return;
+          }
+
+          if (!t.isConditional(node.argument)) {
+            return;
+          }
+
+          var cond = node.argument;
+          cond.alternate = t.unaryExpression("!", cond.alternate, true);
+          cond.consequent = t.unaryExpression("!", cond.consequent, true);
+          path.replaceWith(node.argument);
+        }]
+      },
+
+      ConditionalExpression: {
+        enter: [
+        // !foo ? 'foo' : 'bar' -> foo ? 'bar' : 'foo'
+        // foo !== 'lol' ? 'foo' : 'bar' -> foo === 'lol' ? 'bar' : 'foo'
+        function flipIfOrConditional(path) {
+          var node = path.node;
+
+          if (!path.get("test").isLogicalExpression()) {
+            flipNegation(node);
+            return;
+          }
+
+          if (flipExpressions.shouldFlip(node.test)) {
+            node.test = flipExpressions.flip(node.test);
+            var _ref2 = [node.consequent, node.alternate];
+            node.alternate = _ref2[0];
+            node.consequent = _ref2[1];
+          }
+        }, function simplifyPatterns(path) {
+          var test = path.get("test");
+          var consequent = path.get("consequent");
+          var alternate = path.get("alternate");
+
+          var EX = types.Expression,
+              LE = types.LogicalExpression;
+
+          // Convention:
+          // ===============
+          // for each pattern [test, consequent, alternate, handler(expr, cons, alt)]
+
+          var matcher = new PatternMatch([[LE, true, false, function (e) {
+            return e;
+          }], [EX, true, false, function (e) {
+            return notnot(e);
+          }], [EX, false, true, function (e) {
+            return not(e);
+          }], [LE, true, EX, function (e, c, a) {
+            return or(e, a);
+          }], [EX, true, EX, function (e, c, a) {
+            return or(notnot(e), a);
+          }], [EX, false, EX, function (e, c, a) {
+            return and(not(e), a);
+          }], [EX, EX, true, function (e, c) {
+            return or(not(e), c);
+          }], [LE, EX, false, function (e, c) {
+            return and(e, c);
+          }], [EX, EX, false, function (e, c) {
+            return and(notnot(e), c);
+          }]]);
+
+          var result = matcher.match([test, consequent, alternate], isPatternMatchesPath);
+
+          if (result.match) {
+            path.replaceWith(result.value(test.node, consequent.node, alternate.node));
+          }
+        }],
+
+        exit: [
+        // a ? x = foo : b ? x = bar : x = baz;
+        // x = a ? foo : b ? bar : baz;
+        function (topPath) {
+          if (!topPath.parentPath.isExpressionStatement() && !topPath.parentPath.isSequenceExpression()) {
+            return;
+          }
+
+          var mutations = [];
+          var firstLeft = null;
+          var operator = null;
+          function visit(path) {
+            if (path.isConditionalExpression()) {
+              var _bail = visit(path.get("consequent"));
+              if (_bail) {
+                return true;
+              }
+              _bail = visit(path.get("alternate"));
+              return _bail;
+            }
+
+            if (operator == null) {
+              operator = path.node.operator;
+            } else if (path.node.operator !== operator) {
+              return true;
+            }
+
+            if (!path.isAssignmentExpression() || !(path.get("left").isIdentifier() || path.get("left").isMemberExpression())) {
+              return true;
+            }
+
+            var left = path.get("left").node;
+            if (firstLeft == null) {
+              firstLeft = left;
+            } else if (!isNodesEquiv(left, firstLeft)) {
+              return true;
+            }
+
+            mutations.push(function () {
+              return path.replaceWith(path.get("right").node);
+            });
+          }
+
+          var bail = visit(topPath);
+          if (bail) {
+            return;
+          }
+
+          mutations.forEach(function (f) {
+            return f();
+          });
+          topPath.replaceWith(t.assignmentExpression(operator, firstLeft, topPath.node));
+        },
+
+        // bar ? void 0 : void 0
+        // (bar, void 0)
+        // TODO: turn this into general equiv check
+        function (path) {
+          var node = path.node;
+
+          if (isVoid0(node.consequent) && isVoid0(node.alternate)) {
+            path.replaceWith(t.sequenceExpression([path.node.test, VOID_0]));
+          }
+        },
+
+        // bar ? void 0 : foo ? void 0 : <etc>
+        // bar || foo : void 0
+        // TODO: turn this into general equiv check
+        function (path) {
+          var node = path.node;
+
+
+          if (node[condExprSeen] || !isVoid0(node.consequent)) {
+            return;
+          }
+
+          node[condExprSeen] = true;
+
+          var tests = [node.test];
+          var mutations = [];
+          var alt = void 0;
+
+          var _loop = function _loop(next) {
+            next.node[condExprSeen] = true;
+            alt = next.node.alternate;
+
+            if (isVoid0(next.node.consequent)) {
+              tests.push(next.node.test);
+              mutations.push(function () {
+                return next.remove();
+              });
+            } else {
+              alt = next.node;
+              return "break";
+            }
+          };
+
+          for (var next = path.get("alternate"); next.isConditionalExpression(); next = next.get("alternate")) {
+            var _ret = _loop(next);
+
+            if (_ret === "break") break;
+          }
+
+          if (tests.length === 1) {
+            return;
+          }
+
+          var test = tests.reduce(function (expr, curTest) {
+            return t.logicalExpression("||", expr, curTest);
+          });
+
+          path.replaceWith(t.conditionalExpression(test, VOID_0, alt));
+        }]
+      },
+
+      // concat
+      VariableDeclaration: {
+        enter: [
+        // Put vars with no init at the top.
+        function (path) {
+          var node = path.node;
+
+
+          if (node.declarations.length < 2) {
+            return;
+          }
+
+          var inits = [];
+          var empty = [];
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = node.declarations[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var decl = _step.value;
+
+              if (!decl.init) {
+                empty.push(decl);
+              } else {
+                inits.push(decl);
+              }
+            }
+
+            // This is based on exprimintation but there is a significant
+            // imrpovement when we place empty vars at the top in smaller
+            // files. Whereas it hurts in larger files.
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          if (this.fitsInSlidingWindow) {
+            node.declarations = empty.concat(inits);
+          } else {
+            node.declarations = inits.concat(empty);
+          }
+        }]
+      },
+
+      Function: {
+        enter: earlyReturnTransform,
+
+        exit: function exit(path) {
+          // Useful to do on enter and exit because more oppurtinties can open.
+          earlyReturnTransform(path);
+
+          if (!path.node[shouldRevisit]) {
+            return;
+          }
+
+          delete path.node[shouldRevisit];
+          path.visit();
+        }
+      },
+
+      For: {
+        enter: earlyContinueTransform,
+        exit: earlyContinueTransform
+      },
+
+      ForStatement: {
+
+        // Merge previous expressions in the init part of the for.
+        enter: function enter(path) {
+          var node = path.node;
+
+          if (!path.inList || node.init && !t.isExpression(node.init)) {
+            return;
+          }
+
+          var prev = path.getSibling(path.key - 1);
+          var consumed = false;
+          if (prev.isVariableDeclaration()) {
+            var referencedOutsideLoop = false;
+
+            // we don't care if vars are referenced outside the loop as they are fn scope
+            if (prev.node.kind === "let" || prev.node.kind === "const") {
+              var ids = Object.keys(prev.getBindingIdentifiers());
+
+              idloop: for (var i = 0; i < ids.length; i++) {
+                var refs = prev.scope.bindings[ids[i]].referencePaths;
+                for (var j = 0; j < refs.length; j++) {
+                  if (!isAncestor(path, refs[j])) {
+                    referencedOutsideLoop = true;
+                    break idloop;
+                  }
+                }
+              }
+            }
+
+            if (!node.init && !referencedOutsideLoop) {
+              node.init = prev.node;
+              consumed = true;
+            }
+          } else if (prev.isExpressionStatement()) {
+            var expr = prev.node.expression;
+            if (node.init) {
+              if (t.isSequenceExpression(expr)) {
+                expr.expressions.push(node.init);
+                node.init = expr;
+              } else {
+                node.init = t.sequenceExpression([expr, node.init]);
+              }
+            } else {
+              node.init = expr;
+            }
+            consumed = true;
+          }
+          if (consumed) {
+            prev.remove();
+          }
+        },
+        exit: function exit(path) {
+          var node = path.node;
+
+          if (!node.test) {
+            return;
+          }
+
+          if (!path.get("body").isBlockStatement()) {
+            var bodyNode = path.get("body").node;
+            if (!t.isIfStatement(bodyNode)) {
+              return;
+            }
+
+            if (t.isBreakStatement(bodyNode.consequent, { label: null })) {
+              node.test = t.logicalExpression("&&", node.test, t.unaryExpression("!", bodyNode.test, true));
+              node.body = bodyNode.alternate || t.emptyStatement();
+              return;
+            }
+
+            if (t.isBreakStatement(bodyNode.alternate, { label: null })) {
+              node.test = t.logicalExpression("&&", node.test, bodyNode.test);
+              node.body = bodyNode.consequent || t.emptyStatement();
+              return;
+            }
+
+            return;
+          }
+
+          var statements = node.body.body;
+          var exprs = [];
+          var ifStatement = null;
+          var breakAt = null;
+          var i = 0;
+          for (var statement; statement = statements[i]; i++) {
+            if (t.isIfStatement(statement)) {
+              if (t.isBreakStatement(statement.consequent, { label: null })) {
+                ifStatement = statement;
+                breakAt = "consequent";
+              } else if (t.isBreakStatement(statement.alternate, { label: null })) {
+                ifStatement = statement;
+                breakAt = "alternate";
+              }
+              break;
+            }
+
+            // A statement appears before the break statement then bail.
+            if (!t.isExpressionStatement(statement)) {
+              return;
+            }
+
+            exprs.push(statement.expression);
+          }
+
+          if (!ifStatement) {
+            return;
+          }
+
+          var rest = [];
+
+          if (breakAt = "consequent") {
+            if (t.isBlockStatement(ifStatement.alternate)) {
+              rest.push.apply(rest, _toConsumableArray(ifStatement.alternate.body));
+            } else if (ifStatement.alternate) {
+              rest.push(ifStatement.alternate);
+            }
+          } else {
+            if (t.isBlockStatement(ifStatement.consequent)) {
+              rest.push.apply(rest, _toConsumableArray(ifStatement.consequent.body));
+            } else if (ifStatement.consequent) {
+              rest.push(ifStatement.consequent);
+            }
+          }
+
+          rest.push.apply(rest, _toConsumableArray(statements.slice(i + 1)));
+
+          var test = breakAt === "consequent" ? t.unaryExpression("!", ifStatement.test, true) : ifStatement.test;
+          var expr = void 0;
+          if (exprs.length === 1) {
+            expr = t.sequenceExpression([exprs[0], test]);
+          } else if (exprs.length) {
+            exprs.push(test);
+            expr = t.sequenceExpression(exprs);
+          } else {
+            expr = test;
+          }
+
+          node.test = t.logicalExpression("&&", node.test, expr);
+          if (rest.length === 1) {
+            node.body = rest[0];
+          } else if (rest.length) {
+            node.body = t.blockStatement(rest);
+          } else {
+            node.body = t.emptyStatement();
+          }
+        }
+      },
+
+      Program: function Program(path) {
+        // An approximation of the resultant gzipped code after minification
+        this.fitsInSlidingWindow = path.getSource().length / 10 < 33000;
+
+        var node = path.node;
+
+        var statements = toMultipleSequenceExpressions(node.body);
+        if (!statements.length) {
+          return;
+        }
+        node.body = statements;
+      },
+
+
+      BlockStatement: {
+        enter: function enter(path) {
+          var node = path.node,
+              parent = path.parent;
+
+
+          var top = [];
+          var bottom = [];
+
+          for (var i = 0; i < node.body.length; i++) {
+            var bodyNode = node.body[i];
+            if (t.isFunctionDeclaration(bodyNode)) {
+              top.push(bodyNode);
+            } else {
+              bottom.push(bodyNode);
+            }
+          }
+
+          var statements = top.concat(toMultipleSequenceExpressions(bottom));
+
+          if (!statements.length) {
+            return;
+          }
+
+          if (statements.length > 1 || needsBlock(node, parent) || node.directives) {
+            node.body = statements;
+            return;
+          }
+
+          if (statements.length) {
+            path.replaceWith(statements[0]);
+            return;
+          }
+        },
+        exit: function exit(path) {
+          var node = path.node,
+              parent = path.parent;
+
+
+          if (needsBlock(node, parent)) {
+            return;
+          }
+
+          if (node.body.length === 1) {
+            path.get("body")[0].inList = false;
+            path.replaceWith(node.body[0]);
+            return;
+          }
+
+          if (node.body.length === 0) {
+            path.replaceWith(t.emptyStatement());
+            return;
+          }
+
+          // Check if oppurtinties to merge statements are available.
+          var statements = node.body;
+          if (!statements.length) {
+            return;
+          }
+
+          var _iteratorNormalCompletion2 = true;
+          var _didIteratorError2 = false;
+          var _iteratorError2 = undefined;
+
+          try {
+            for (var _iterator2 = statements[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+              var statement = _step2.value;
+
+              if (!t.isExpressionStatement(statement)) {
+                return;
+              }
+            }
+          } catch (err) {
+            _didIteratorError2 = true;
+            _iteratorError2 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                _iterator2.return();
+              }
+            } finally {
+              if (_didIteratorError2) {
+                throw _iteratorError2;
+              }
+            }
+          }
+
+          path.visit();
+        }
+      },
+
+      ThrowStatement: createPrevExpressionEater("throw"),
+
+      // Try to merge previous statements into a sequence
+      ReturnStatement: {
+        enter: [createPrevExpressionEater("return"),
+
+        // Remove return if last statement with no argument.
+        // Replace return with `void` argument with argument.
+        function (path) {
+          var node = path.node;
+
+
+          if (!path.parentPath.parentPath.isFunction() || path.getSibling(path.key + 1).node) {
+            return;
+          }
+
+          if (!node.argument) {
+            path.remove();
+            return;
+          }
+
+          if (t.isUnaryExpression(node.argument, { operator: "void" })) {
+            path.replaceWith(node.argument.argument);
+          }
+        }]
+      },
+
+      // turn blocked ifs into single statements
+      IfStatement: {
+        exit: [
+        // Merge nested if statements if possible
+        function (_ref3) {
+          var node = _ref3.node;
+
+          if (!t.isIfStatement(node.consequent)) {
+            return;
+          }
+
+          if (node.alternate || node.consequent.alternate) {
+            return;
+          }
+
+          node.test = t.logicalExpression("&&", node.test, node.consequent.test);
+          node.consequent = node.consequent.consequent;
+        }, function (path) {
+          var node = path.node;
+
+          // No alternate, make into a guarded expression
+
+          if (node.consequent && !node.alternate && node.consequent.type === "ExpressionStatement") {
+            var op = "&&";
+            if (t.isUnaryExpression(node.test, { operator: "!" })) {
+              node.test = node.test.argument;
+              op = "||";
+            }
+
+            path.replaceWith(t.expressionStatement(t.logicalExpression(op, node.test, node.consequent.expression)));
+            return;
+          }
+
+          // Easy, both are expressions, turn into ternary
+          if (t.isExpressionStatement(node.consequent) && t.isExpressionStatement(node.alternate)) {
+            path.replaceWith(t.conditionalExpression(node.test, node.consequent.expression, node.alternate.expression));
+            return;
+          }
+
+          // There is nothing after this block. And one or both
+          // of the consequent and alternate are either expression statment
+          // or return statements.
+          if (!path.getSibling(path.key + 1).node && path.parentPath && path.parentPath.parentPath && path.parentPath.parentPath.isFunction()) {
+            // Easy: consequent and alternate are return -- conditional.
+            if (t.isReturnStatement(node.consequent) && t.isReturnStatement(node.alternate)) {
+              if (!node.consequent.argument && !node.altenrate.argument) {
+                path.replaceWith(t.expressionStatement(node.test));
+                return;
+              }
+
+              path.replaceWith(t.returnStatement(t.conditionalExpression(node.test, node.consequent.argument || VOID_0, node.alternate.argument || VOID_0)));
+              return;
+            }
+
+            // Only the consequent is a return, void the alternate.
+            if (t.isReturnStatement(node.consequent) && t.isExpressionStatement(node.alternate)) {
+              if (!node.consequent.argument) {
+                path.replaceWith(t.expressionStatement(t.logicalExpression("||", node.test, node.alternate.expression)));
+                return;
+              }
+
+              path.replaceWith(t.returnStatement(t.conditionalExpression(node.test, node.consequent.argument || VOID_0, t.unaryExpression("void", node.alternate.expression, true))));
+              return;
+            }
+
+            // Only the alternate is a return, void the consequent.
+            if (t.isReturnStatement(node.alternate) && t.isExpressionStatement(node.consequent)) {
+              if (!node.alternate.argument) {
+                path.replaceWith(t.expressionStatement(t.logicalExpression("&&", node.test, node.consequent.expression)));
+                return;
+              }
+
+              path.replaceWith(t.returnStatement(t.conditionalExpression(node.test, t.unaryExpression("void", node.consequent.expression, true), node.alternate.argument || VOID_0)));
+              return;
+            }
+
+            if (t.isReturnStatement(node.consequent) && !node.alternate) {
+              if (!node.consequent.argument) {
+                path.replaceWith(t.expressionStatement(node.test));
+                return;
+              }
+
+              // This would only be worth it if the previous statement was an if
+              // because then we may merge to create a conditional.
+              if (path.getSibling(path.key - 1).isIfStatement()) {
+                path.replaceWith(t.returnStatement(t.conditionalExpression(node.test, node.consequent.argument || VOID_0, VOID_0)));
+                return;
+              }
+            }
+
+            if (t.isReturnStatement(node.alternate) && !node.consequent) {
+              if (!node.alternate.argument) {
+                path.replaceWith(t.expressionStatement(node.test));
+                return;
+              }
+
+              // Same as above.
+              if (path.getSibling(path.key - 1).isIfStatement()) {
+                path.replaceWith(t.returnStatement(t.conditionalExpression(node.test, node.alternate.argument || VOID_0, VOID_0)));
+                return;
+              }
+            }
+          }
+
+          var next = path.getSibling(path.key + 1);
+
+          // If the next satatement(s) is an if statement and we can simplify that
+          // to potentailly be an expression (or a return) then this will make it
+          // easier merge.
+          if (next.isIfStatement()) {
+            next.pushContext(path.context);
+            next.visit();
+            next.popContext();
+            next = path.getSibling(path.key + 1);
+          }
+
+          // Some other visitor might have deleted our node. OUR NODE ;_;
+          if (!path.node) {
+            return;
+          }
+
+          // No alternate but the next statement is a return
+          // also turn into a return conditional
+          if (t.isReturnStatement(node.consequent) && !node.alternate && next.isReturnStatement()) {
+            var nextArg = next.node.argument || VOID_0;
+            next.remove();
+            path.replaceWith(t.returnStatement(t.conditionalExpression(node.test, node.consequent.argument || VOID_0, nextArg)));
+            return;
+          }
+
+          // Next is the last expression, turn into a return while void'ing the exprs
+          if (path.parentPath && path.parentPath.parentPath && path.parentPath.parentPath.isFunction() && !path.getSibling(path.key + 2).node && t.isReturnStatement(node.consequent) && !node.alternate && next.isExpressionStatement()) {
+            var nextExpr = next.node.expression;
+            next.remove();
+            if (node.consequent.argument) {
+              path.replaceWith(t.returnStatement(t.conditionalExpression(node.test, node.consequent.argument, t.unaryExpression("void", nextExpr, true))));
+              return;
+            }
+
+            path.replaceWith(t.logicalExpression("||", node.test, nextExpr));
+            return;
+          }
+
+          if (node.consequent && node.alternate && (t.isReturnStatement(node.consequent) || t.isBlockStatement(node.consequent) && t.isReturnStatement(node.consequent.body[node.consequent.body.length - 1]))) {
+            path.insertAfter(t.isBlockStatement(node.alternate) ? node.alternate.body : node.alternate);
+            node.alternate = null;
+            return;
+          }
+        },
+
+        // If the consequent is if and the altenrate is not then
+        // switch them out. That way we know we don't have to print
+        // a block.x
+        function (path) {
+          var node = path.node;
+
+
+          if (!node.alternate) {
+            return;
+          }
+
+          if (!t.isIfStatement(node.consequent)) {
+            return;
+          }
+
+          if (t.isIfStatement(node.alternate)) {
+            return;
+          }
+
+          node.test = t.unaryExpression("!", node.test, true);
+          var _ref4 = [node.consequent, node.alternate];
+          node.alternate = _ref4[0];
+          node.consequent = _ref4[1];
+        },
+
+        // Make if statements with conditional returns in the body into
+        // an if statement that guards the rest of the block.
+        function (path) {
+          var node = path.node;
+
+
+          if (!path.inList || !path.get("consequent").isBlockStatement() || node.alternate) {
+            return;
+          }
+
+          var ret = void 0;
+          var test = void 0;
+          var exprs = [];
+          var statements = node.consequent.body;
+
+          for (var i = 0, statement; statement = statements[i]; i++) {
+            if (t.isExpressionStatement(statement)) {
+              exprs.push(statement.expression);
+            } else if (t.isIfStatement(statement)) {
+              if (i < statements.length - 1) {
+                // This isn't the last statement. Bail.
+                return;
+              }
+              if (statement.alternate) {
+                return;
+              }
+              if (!t.isReturnStatement(statement.consequent)) {
+                return;
+              }
+              ret = statement.consequent;
+              test = statement.test;
+            } else {
+              return;
+            }
+          }
+
+          if (!test || !ret) {
+            return;
+          }
+
+          exprs.push(test);
+
+          var expr = exprs.length === 1 ? exprs[0] : t.sequenceExpression(exprs);
+
+          var replacement = t.logicalExpression("&&", node.test, expr);
+
+          path.replaceWith(t.ifStatement(replacement, ret, null));
+        }, createPrevExpressionEater("if")]
+      },
+
+      WhileStatement: function WhileStatement(path) {
+        var node = path.node;
+
+        path.replaceWith(t.forStatement(null, node.test, null, node.body));
+      },
+
+
+      ForInStatement: createPrevExpressionEater("for-in"),
+
+      // Flatten sequence expressions.
+      SequenceExpression: {
+        exit: function exit(path) {
+          if (path.node[seqExprSeen]) {
+            return;
+          }
+
+          function flatten(node) {
+            node[seqExprSeen] = true;
+            var ret = [];
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
+
+            try {
+              for (var _iterator3 = node.expressions[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                var n = _step3.value;
+
+                if (t.isSequenceExpression(n)) {
+                  ret.push.apply(ret, _toConsumableArray(flatten(n)));
+                } else {
+                  ret.push(n);
+                }
+              }
+            } catch (err) {
+              _didIteratorError3 = true;
+              _iteratorError3 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                  _iterator3.return();
+                }
+              } finally {
+                if (_didIteratorError3) {
+                  throw _iteratorError3;
+                }
+              }
+            }
+
+            return ret;
+          }
+
+          path.node.expressions = flatten(path.node);
+        }
+      },
+
+      SwitchCase: function SwitchCase(path) {
+        var node = path.node;
+
+
+        if (!node.consequent.length) {
+          return;
+        }
+
+        node.consequent = toMultipleSequenceExpressions(node.consequent);
+      },
+
+
+      SwitchStatement: {
+        exit: [
+
+        // Convert switch statements with all returns in their cases
+        // to return conditional.
+        function (path) {
+          var node = path.node;
+
+          // Need to be careful of side-effects.
+
+          if (!t.isIdentifier(node.discriminant)) {
+            return;
+          }
+
+          if (!node.cases.length) {
+            return;
+          }
+
+          var consTestPairs = [];
+          var fallThru = [];
+          var defaultRet = void 0;
+          var _iteratorNormalCompletion4 = true;
+          var _didIteratorError4 = false;
+          var _iteratorError4 = undefined;
+
+          try {
+            for (var _iterator4 = node.cases[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+              var switchCase = _step4.value;
+
+              if (switchCase.consequent.length > 1) {
+                return;
+              }
+
+              var cons = switchCase.consequent[0];
+
+              if (!switchCase.test) {
+                if (!t.isReturnStatement(cons)) {
+                  return;
+                }
+                defaultRet = cons;
+                continue;
+              }
+
+              if (!switchCase.consequent.length) {
+                if (fallThru.length) {
+                  fallThru.push(switchCase.test);
+                } else {
+                  fallThru = [switchCase.test];
+                }
+                continue;
+              }
+
+              // TODO: can we void it?
+              if (!t.isReturnStatement(cons)) {
+                return;
+              }
+
+              var test = t.binaryExpression("===", node.discriminant, switchCase.test);
+              if (fallThru.length) {
+                test = fallThru.reduceRight(function (right, test) {
+                  return t.logicalExpression("||", t.binaryExpression("===", node.discriminant, test), right);
+                }, test);
+                fallThru = [];
+              }
+
+              consTestPairs.push([test, cons.argument || VOID_0]);
+            }
+
+            // Bail if we have any remaining fallthrough
+          } catch (err) {
+            _didIteratorError4 = true;
+            _iteratorError4 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                _iterator4.return();
+              }
+            } finally {
+              if (_didIteratorError4) {
+                throw _iteratorError4;
+              }
+            }
+          }
+
+          if (fallThru.length) {
+            return;
+          }
+
+          // We need the default to be there to make sure there is an oppurtinity
+          // not to return.
+          if (!defaultRet) {
+            if (path.inList) {
+              var nextPath = path.getSibling(path.key + 1);
+              if (nextPath.isReturnStatement()) {
+                defaultRet = nextPath.node;
+                nextPath.remove();
+              } else if (!nextPath.node && path.parentPath.parentPath.isFunction()) {
+                // If this is the last statement in a function we just fake a void return.
+                defaultRet = t.returnStatement(VOID_0);
+              } else {
+                return;
+              }
+            } else {
+              return;
+            }
+          }
+
+          var cond = consTestPairs.reduceRight(function (alt, _ref5) {
+            var _ref6 = _slicedToArray(_ref5, 2),
+                test = _ref6[0],
+                cons = _ref6[1];
+
+            return t.conditionalExpression(test, cons, alt);
+          }, defaultRet.argument || VOID_0);
+
+          path.replaceWith(t.returnStatement(cond));
+
+          // Maybe now we can merge with some previous switch statement.
+          if (path.inList) {
+            var prev = path.getSibling(path.key - 1);
+            if (prev.isSwitchStatement()) {
+              prev.visit();
+            }
+          }
+        },
+
+        // Convert switches into conditionals.
+        function (path) {
+          var node = path.node;
+
+          // Need to be careful of side-effects.
+
+          if (!t.isIdentifier(node.discriminant)) {
+            return;
+          }
+
+          if (!node.cases.length) {
+            return;
+          }
+
+          var exprTestPairs = [];
+          var fallThru = [];
+          var defaultExpr = void 0;
+          var _iteratorNormalCompletion5 = true;
+          var _didIteratorError5 = false;
+          var _iteratorError5 = undefined;
+
+          try {
+            for (var _iterator5 = node.cases[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+              var switchCase = _step5.value;
+
+              if (!switchCase.test) {
+                if (switchCase.consequent.length !== 1) {
+                  return;
+                }
+                if (!t.isExpressionStatement(switchCase.consequent[0])) {
+                  return;
+                }
+                defaultExpr = switchCase.consequent[0].expression;
+                continue;
+              }
+
+              if (!switchCase.consequent.length) {
+                if (fallThru.length) {
+                  fallThru.push(switchCase.test);
+                } else {
+                  fallThru = [switchCase.test];
+                }
+                continue;
+              }
+
+              var _switchCase$consequen = _slicedToArray(switchCase.consequent, 2),
+                  cons = _switchCase$consequen[0],
+                  breakStatement = _switchCase$consequen[1];
+
+              if (switchCase === node.cases[node.cases.length - 1]) {
+                if (breakStatement && !t.isBreakStatement(breakStatement)) {
+                  return;
+                }
+              } else if (!t.isBreakStatement(breakStatement)) {
+                return;
+              }
+
+              if (!t.isExpressionStatement(cons) || switchCase.consequent.length > 2) {
+                return;
+              }
+
+              var test = t.binaryExpression("===", node.discriminant, switchCase.test);
+              if (fallThru.length) {
+                test = fallThru.reduceRight(function (right, test) {
+                  return t.logicalExpression("||", t.binaryExpression("===", node.discriminant, test), right);
+                }, test);
+                fallThru = [];
+              }
+
+              exprTestPairs.push([test, cons.expression]);
+            }
+          } catch (err) {
+            _didIteratorError5 = true;
+            _iteratorError5 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                _iterator5.return();
+              }
+            } finally {
+              if (_didIteratorError5) {
+                throw _iteratorError5;
+              }
+            }
+          }
+
+          if (fallThru.length) {
+            return;
+          }
+
+          var cond = exprTestPairs.reduceRight(function (alt, _ref7) {
+            var _ref8 = _slicedToArray(_ref7, 2),
+                test = _ref8[0],
+                cons = _ref8[1];
+
+            return t.conditionalExpression(test, cons, alt);
+          }, defaultExpr || VOID_0);
+
+          path.replaceWith(cond);
+        }, function (path) {
+          var node = path.node;
+
+
+          if (!node.cases.length) {
+            return;
+          }
+
+          var lastCase = path.get("cases")[node.cases.length - 1];
+          if (!lastCase.node.consequent.length) {
+            return;
+          }
+
+          var potentialBreak = lastCase.get("consequent")[lastCase.node.consequent.length - 1];
+          if (t.isBreakStatement(potentialBreak) && potentialBreak.node.label === null) {
+            potentialBreak.remove();
+          }
+        }, createPrevExpressionEater("switch")]
+      }
+    }
+  };
+
+  function flipNegation(node) {
+    if (!node.consequent || !node.alternate) {
+      return;
+    }
+
+    var test = node.test;
+    var flip = false;
+
+    if (t.isBinaryExpression(test)) {
+      if (test.operator === "!==") {
+        test.operator = "===";
+        flip = true;
+      }
+
+      if (test.operator === "!=") {
+        test.operator = "==";
+        flip = true;
+      }
+    }
+
+    if (t.isUnaryExpression(test, { operator: "!" })) {
+      node.test = test.argument;
+      flip = true;
+    }
+
+    if (flip) {
+      var consequent = node.consequent;
+      node.consequent = node.alternate;
+      node.alternate = consequent;
+    }
+  }
+
+  function needsBlock(node, parent) {
+    return t.isFunction(parent) && node === parent.body || t.isTryStatement(parent) || t.isCatchClause(parent) || t.isSwitchStatement(parent) || isSingleBlockScopeDeclaration(node) && t.isIfStatement(parent);
+  }
+
+  function isSingleBlockScopeDeclaration(block) {
+    return t.isBlockStatement(block) && block.body.length === 1 && (t.isVariableDeclaration(block.body[0], { kind: "let" }) || t.isVariableDeclaration(block.body[0], { kind: "const" }) || t.isFunctionDeclaration(block.body[0]));
+  }
+
+  function isVoid0(expr) {
+    return expr === VOID_0 || t.isUnaryExpression(expr, { operator: "void" }) && t.isNumericLiteral(expr.argument, { value: 0 });
+  }
+
+  function earlyReturnTransform(path) {
+    var node = path.node;
+
+
+    if (!t.isBlockStatement(node.body)) {
+      return;
+    }
+
+    for (var i = node.body.body.length; i >= 0; i--) {
+      var statement = node.body.body[i];
+      if (t.isIfStatement(statement) && !statement.alternate && t.isReturnStatement(statement.consequent) && !statement.consequent.argument) {
+        genericEarlyExitTransform(path.get("body").get("body")[i]);
+      }
+    }
+  }
+
+  function earlyContinueTransform(path) {
+    var node = path.node;
+
+
+    if (!t.isBlockStatement(node.body)) {
+      return;
+    }
+
+    for (var i = node.body.body.length; i >= 0; i--) {
+      var statement = node.body.body[i];
+      if (t.isIfStatement(statement) && !statement.alternate && t.isContinueStatement(statement.consequent) && !statement.consequent.label) {
+        genericEarlyExitTransform(path.get("body").get("body")[i]);
+      }
+    }
+
+    // We may have reduced the body to a single statement.
+    if (node.body.body.length === 1) {
+      path.get("body").replaceWith(node.body.body[0]);
+    }
+  }
+
+  function genericEarlyExitTransform(path) {
+    var node = path.node;
+
+
+    var statements = path.container.slice(path.key + 1);
+    if (!statements.length) {
+      path.replaceWith(t.expressionStatement(node.test));
+      return;
+    }
+
+    var test = node.test;
+    if (t.isBinaryExpression(test) && test.operator === "!==") {
+      test.operator = "===";
+    } else if (t.isBinaryExpression(test) && test.operator === "!=") {
+      test.operator = "==";
+    } else if (t.isUnaryExpression(test, { operator: "!" })) {
+      node.test = test.argument;
+    } else {
+      node.test = t.unaryExpression("!", node.test, true);
+    }
+
+    var l = statements.length;
+    while (l-- > 0) {
+      path.getSibling(path.key + 1).remove();
+    }
+
+    if (statements.length === 1) {
+      node.consequent = statements[0];
+    } else {
+      node.consequent = t.blockStatement(statements);
+    }
+
+    path.visit();
+  }
+
+  function createPrevExpressionEater(keyword) {
+    var key = void 0;
+    switch (keyword) {
+      case "switch":
+        key = "discriminant";break;
+      case "throw":
+      case "return":
+        key = "argument";break;
+      case "if":
+        key = "test";break;
+      case "for-in":
+        key = "right";break;
+    }
+
+    return function (path) {
+      if (!path.inList) {
+        return;
+      }
+
+      var node = path.node;
+
+      var prev = path.getSibling(path.key - 1);
+      if (!prev.isExpressionStatement()) {
+        return;
+      }
+
+      var seq = prev.node.expression;
+      if (node[key]) {
+        if (t.isSequenceExpression(seq)) {
+          seq.expressions.push(node[key]);
+        } else {
+          seq = t.sequenceExpression([seq, node[key]]);
+        }
+      } else {
+        if (t.isSequenceExpression(seq)) {
+          var lastExpr = seq.expressions[seq.expressions.length - 1];
+          seq.expressions[seq.expressions.length - 1] = t.unaryExpression("void", lastExpr, true);
+        } else {
+          seq = t.unaryExpression("void", seq, true);
+        }
+      }
+
+      if (seq) {
+        node[key] = seq;
+        prev.remove();
+
+        // Since we were able to merge some stuff it's possible that this has opened
+        // oppurtinties for other transforms to happen.
+        // TODO: Look into changing the traversal order from bottom to up to avoid
+        // having to revisit things.
+        if (path.parentPath.parent) {
+          path.parentPath.parent[shouldRevisit] = true;
+        }
+      }
+    };
+  }
+
+  function isPatternMatchesPath(patternValue, inputPath) {
+    if (Array.isArray(patternValue)) {
+      for (var i = 0; i < patternValue.length; i++) {
+        if (isPatternMatchesPath(patternValue[i], inputPath)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    if (isNodeOfType(inputPath.node, patternValue)) return true;
+    var evalResult = inputPath.evaluate();
+    if (!evalResult.confident || !inputPath.isPure()) return false;
+    return evalResult.value === patternValue;
+  }
+
+  // path1 -> path2
+  // is path1 an ancestor of path2
+  function isAncestor(path1, path2) {
+    return !!path2.findParent(function (parent) {
+      return parent === path1;
+    });
+  }
+};
+
+/***/ },
+/* 37 */
+/***/ function(module, exports) {
+
+"use strict";
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+module.exports = function () {
+  function PatternMatch(patterns) {
+    _classCallCheck(this, PatternMatch);
+
+    this.decisionTree = this.makeDecisionTree(patterns);
+  }
+
+  _createClass(PatternMatch, [{
+    key: "handle",
+    value: function handle(input, isMatch) {
+      var result = this.match(input, isMatch);
+
+      if (!result.match) {
+        throw new Error("No Match Found for " + input.toString());
+      }
+
+      if (typeof result.value !== "function") {
+        throw new Error("Expecting a function. Instead got - " + result.value.toString());
+      }
+
+      result.value.call(null, input, result.keys);
+    }
+  }, {
+    key: "match",
+    value: function match(input) {
+      var isMatch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function (a, b) {
+        return a === b;
+      };
+
+      var current = this.decisionTree;
+      var result = {
+        match: false,
+        value: void 0,
+        keys: []
+      };
+
+      // to handle falsy keys
+      var NO_MATCH = Symbol("NO_MATCH");
+
+      for (var i = 0; i < input.length; i++) {
+        var matchedKey = NO_MATCH;
+
+        // because map doesn't support custom key equal function
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = current.keys()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var key = _step.value;
+
+            if (isMatch(key, input[i])) {
+              matchedKey = key;
+              result.keys.push(matchedKey);
+              break;
+            }
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+
+        if (matchedKey !== NO_MATCH) {
+          current = current.get(matchedKey);
+
+          if (i === input.length - 1) {
+            result.match = true;
+            result.value = current;
+            break;
+          }
+        }
+      }
+      return result;
+    }
+  }, {
+    key: "makeDecisionTree",
+    value: function makeDecisionTree(patterns) {
+      // order of keys in a Map is the order of insertion
+      var root = new Map();
+
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = patterns[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var pattern = _step2.value;
+
+          make(root, pattern);
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+
+      return root;
+
+      function make(parent, pattern) {
+        if (pattern.length < 2) {
+          throw new Error("at least 2 elements required in a pattern");
+        }
+
+        if (pattern.length === 2) {
+          // here we don't handle duplicates
+          // this pattern would have already been matched
+          if (!parent.has(pattern[0])) {
+            parent.set(pattern[0], pattern[1]);
+          }
+
+          return parent;
+        }
+
+        var _pattern = _toArray(pattern),
+            current = _pattern[0],
+            rest = _pattern.slice(1);
+
+        if (parent.has(current)) {
+          make(parent.get(current), rest);
+        } else {
+          parent.set(current, make(new Map(), rest));
+        }
+        return parent;
+      }
+    }
+  }]);
+
+  return PatternMatch;
+}();
+
+/***/ },
+/* 38 */
+31,
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(21);
+
+
+/***/ },
+/* 40 */
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(23);
+
+
+/***/ },
+/* 41 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+"use strict";
+
+function replaceArray(t, path) {
+  var node = path.node;
+  // arguments is taken :(
+
+  var constructorArgs = path.get("arguments");
+  if (t.isIdentifier(node.callee, { name: "Array" }) && !path.scope.getBinding("Array")) {
+
+    if (constructorArgs.length === 0) {
+      // Array() -> []
+      path.replaceWith(t.arrayExpression([]));
+    } else if (constructorArgs.length === 1) {
+      var arg = constructorArgs[0];
+      var result = arg.evaluate();
+
+      if (result.confident) {
+        if (typeof result.value === "number") {
+          if (result.value >= 0 && result.value <= 6 && result.value % 1 === 0) {
+            // "Array(7)" is shorter than "[,,,,,,,]"
+            path.replaceWith(t.arrayExpression(Array(result.value).fill(null)));
+          } else {
+            dropNewIfPresent();
+          }
+        } else {
+          // Array("Asdf"), Array(true), Array(false)
+          path.replaceWith(t.arrayExpression([t.valueToNode(result.value)]));
+        }
+      } else {
+        var transformables = ["ArrayExpression", "ObjectExpression", "FunctionExpression", "ArrowFunctionExpression", "ClassExpression"];
+        if (transformables.indexOf(arg.node.type) !== -1) {
+          // Array([]), Array({})
+          // Array(()=>{}), Array(class{}), Array(function(){})
+          path.replaceWith(t.arrayExpression([arg.node]));
+        } else {
+          // Array(x); Array(a.b);
+          dropNewIfPresent();
+        }
+      }
+    } else {
+      // Array(2,3), Array(a,b) => [2,3], [a,b]
+      path.replaceWith(t.arrayExpression(node.arguments));
+    }
+    return true;
+  }
+
+  function dropNewIfPresent() {
+    if (path.isNewExpression()) {
+      path.replaceWith(t.callExpression(node.callee, node.arguments));
+    }
+  }
+}
+
+function replaceObject(t, path) {
+  var node = path.node;
+
+  if (t.isIdentifier(node.callee, { name: "Object" }) && !path.scope.getBinding("Object")) {
+
+    var isVoid0 = __webpack_require__(42)(t);
+    var arg = node.arguments[0];
+    var binding = arg && t.isIdentifier(arg) && path.scope.getBinding(arg.name);
+
+    // Object() -> {}
+    if (node.arguments.length === 0) {
+      path.replaceWith(t.objectExpression([]));
+
+      // Object([]) -> []
+    } else if (arg.type === "ArrayExpression" || t.isFunctionExpression(arg)) {
+      path.replaceWith(arg);
+
+      // Object(null) -> {}
+    } else if (isVoid0(arg) || arg.name === "undefined" || arg.type === "NullLiteral" || arg.type === "ObjectExpression" && arg.properties.length === 0) {
+      path.replaceWith(t.objectExpression([]));
+
+      // Object(localFn) -> localFn
+    } else if (binding && binding.path.isFunction()) {
+      path.replaceWith(arg);
+
+      // Object({a:b}) -> {a:b}
+    } else if (arg.type === "ObjectExpression") {
+      path.replaceWith(arg);
+
+      // new Object(a) -> Object(a)
+    } else if (node.type === "NewExpression") {
+      path.replaceWith(t.callExpression(node.callee, node.arguments));
+    }
+    return true;
+  }
+}
+
+module.exports = function (_ref) {
+  var t = _ref.types;
+
+  return {
+    name: "minify-type-constructors",
+    visitor: {
+      CallExpression: function CallExpression(path) {
+        var node = path.node;
+
+        // Boolean(foo) -> !!foo
+
+        if (t.isIdentifier(node.callee, { name: "Boolean" }) && node.arguments.length === 1 && !path.scope.getBinding("Boolean")) {
+          path.replaceWith(t.unaryExpression("!", t.unaryExpression("!", node.arguments[0], true), true));
+          return;
+        }
+
+        // Number(foo) -> +foo
+        if (t.isIdentifier(node.callee, { name: "Number" }) && node.arguments.length === 1 && !path.scope.getBinding("Number")) {
+          path.replaceWith(t.unaryExpression("+", node.arguments[0], true));
+          return;
+        }
+
+        // String(foo) -> foo + ''
+        if (t.isIdentifier(node.callee, { name: "String" }) && node.arguments.length === 1 && !path.scope.getBinding("String")) {
+          path.replaceWith(t.binaryExpression("+", node.arguments[0], t.stringLiteral("")));
+          return;
+        }
+
+        // Array() -> []
+        if (replaceArray(t, path)) {
+          return;
+        }
+
+        // Object() -> {}
+        if (replaceObject(t, path)) {
+          return;
+        }
+      },
+      NewExpression: function NewExpression(path) {
+        // new Array() -> []
+        if (replaceArray(t, path)) {
+          return;
+        }
+
+        // new Object() -> {}
+        if (replaceObject(t, path)) {
+          return;
+        }
+      }
+    }
+  };
+};
+
+/***/ },
+/* 42 */
+29,
+/* 43 */
+/***/ function(module, exports) {
+
+"use strict";
+"use strict";
+
+module.exports = function (_ref) {
+  var t = _ref.types;
+
+  return {
+    name: "transform-regexp-constructors",
+    visitor: {
+      NewExpression: function NewExpression(path) {
+        if (!t.isIdentifier(path.node.callee, { name: "RegExp" })) {
+          return;
+        }
+        var evaluatedArgs = path.get("arguments").map(function (a) {
+          return a.evaluate();
+        });
+        if (!evaluatedArgs.every(function (a) {
+          return a.confident === true && typeof a.value === "string";
+        })) {
+          return;
+        }
+        var pattern = evaluatedArgs.length >= 1 && evaluatedArgs[0].value !== "" ? evaluatedArgs[0].value : "(?:)";
+        var flags = evaluatedArgs.length >= 2 ? evaluatedArgs[1].value : "";
+        path.replaceWith(t.regExpLiteral(pattern, flags));
+      }
+    }
+  };
+};
+
+/***/ },
+/* 44 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+"use strict";
+
+module.exports = {
+  minified: true,
+  plugins: [__webpack_require__(2), __webpack_require__(3), __webpack_require__(4), __webpack_require__(5), __webpack_require__(6), __webpack_require__(7), __webpack_require__(8), __webpack_require__(9), __webpack_require__(10), __webpack_require__(11), __webpack_require__(12), __webpack_require__(13), __webpack_require__(14), __webpack_require__(15), __webpack_require__(16), __webpack_require__(17), __webpack_require__(18)]
+};
+
+/***/ }
+/******/ ])));

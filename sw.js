@@ -7,7 +7,9 @@ toolbox.precache([
   "static/worker.js",
   "static/styles.css",
   "./",
-  "//cdn.jsdelivr.net/ace/1.2.3/min/ace.js"
+  "//cdn.jsdelivr.net/ace/1.2.3/min/ace.js",
+  "build/babel-preset-babili.js",
+  "build/babel-core.js"
 ]);
 
 toolbox.router.get("/", toolbox.fastest);

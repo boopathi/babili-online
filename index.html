@@ -9,14 +9,28 @@
     <link rel="dns-prefetch" href="//cdn.jsdelivr.net" />
     <link rel="dns-prefetch" href="//fonts.googleapis.com" />
 
+    <!--
+      To download these two parallely as they are imported
+      sequentially using importScripts in worker and importScripts
+      are not statically analyzable
+    -->
+    <link rel="preload" href="build/babel-core.js" />
+    <link rel="preload" href="build/babel-preset-babili.js" />
+
     <link rel="prefetch" href="static/worker.js" />
     <link rel="prefetch" href="static/script.js" />
     <link rel="prefetch" href="//cdn.jsdelivr.net/localforage/1.4.2/localforage.min.js" />
     <link rel="prefetch" href="//cdn.jsdelivr.net/ace/1.2.3/min/ace.js" />
+    <link rel="prefetch" href="//fonts.googleapis.com/css?family=Roboto:300,400" />
+    <link rel="prefetch" href="static/GitHub-Mark-Light-32px.png" />
+    <link rel="prefetch" href="static/ic_delete_forever_white_24px.svg" />
+
+    <link rel="preconnect" href="//fonts.googleapis.com"/>
+    <link rel="preconnect" href="//cdn.jsdelivr.net"/>
+
+    <link rel="stylesheet" href="static/styles.css" />
   </head>
   <body>
-    <link href="//fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">
-    <link rel="stylesheet" href="static/styles.css" />
     <div class="fill-height column">
       <div class="row center header">
         <h1 class="title">Babili</h1>
@@ -47,6 +61,7 @@
       </div>
     </div>
 
+    <link href="//fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">
     <script src="//cdn.jsdelivr.net/localforage/1.4.2/localforage.min.js"></script>
     <script src="//cdn.jsdelivr.net/ace/1.2.3/min/ace.js"></script>
     <script src="static/script.js"></script>
