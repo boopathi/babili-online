@@ -1,7 +1,7 @@
 {
   "name": "babili-online",
   "version": "1.0.0",
-  "description": "",
+  "description": "Babili Online - For my experiments",
   "private": true,
   "main": "index.js",
   "scripts": {},
