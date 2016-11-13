@@ -7,7 +7,7 @@
   "scripts": {
     "prod": "NODE_ENV=production npm run build && npm run copy",
     "build": "webpack && node src/render.js",
-    "copy": "mkdir -p dist && cp -R {index.html,sw.js,favicon.ico,static,build} dist/"
+    "copy": "mkdir -p dist && cp -r {index.html,sw.js,favicon.ico,static,build} dist/"
   },
   "keywords": [],
   "author": "boopathi",
