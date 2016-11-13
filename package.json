@@ -4,7 +4,11 @@
   "description": "",
   "private": true,
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "prod": "NODE_ENV=production npm run build && npm run copy",
+    "build": "webpack && node src/render.js",
+    "copy": "mkdir -p dist && cp -R {index.html,sw.js,favicon.ico,static,build} dist/"
+  },
   "keywords": [],
   "author": "boopathi",
   "license": "MIT",
@@ -15,6 +19,7 @@
     "babel-preset-babili": "^0.0.8",
     "babel-preset-es2016": "^6.16.0",
     "babili-webpack-plugin": "^0.0.6",
+    "handlebars": "^4.0.6",
     "json-loader": "^0.5.4",
     "sw-toolbox": "^3.4.0",
     "webpack": "v2.1.0-beta.25"
