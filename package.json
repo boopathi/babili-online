@@ -7,7 +7,7 @@
   "scripts": {
     "prod": "NODE_ENV=production npm run build && npm run copy",
     "build": "webpack && node src/render.js",
-    "copy": "mkdir -p dist && cp -r {index.html,sw.js,favicon.ico,static,build} dist/"
+    "copy": "mkdir -p dist && node src/copy-to-dist"
   },
   "keywords": [],
   "author": "boopathi",
@@ -23,5 +23,8 @@
     "json-loader": "^0.5.4",
     "sw-toolbox": "^3.4.0",
     "webpack": "v2.1.0-beta.25"
+  },
+  "dependencies": {
+    "fs-extra": "^1.0.0"
   }
 }
