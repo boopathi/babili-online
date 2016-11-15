@@ -10,6 +10,14 @@ const REPO_URL = "https://github.com/babel/babili";
 
 module.exports = render;
 
+if (require.main === module) {
+  render().then(result => {
+    console.log("Rendered index.html");
+    console.log("Branch:\t", result.branchName);
+    console.log("PR:\t", result.github.tree);
+  });
+}
+
 function render() {
   const templateContents = fs.readFileSync(path.join(__dirname, "index.hbs")).toString();
   const hbsRenderer = hbs.compile(templateContents);
@@ -54,14 +62,6 @@ function render() {
         github
       }
     });
-}
-
-if (require.main === module) {
-  render().then(result => {
-    console.log("Rendered index.html");
-    console.log("Branch:\t", result.branchName);
-    console.log("PR:\t", result.github.tree);
-  });
 }
 
 function getPullRequest(branchName) {
