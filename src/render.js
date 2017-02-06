@@ -19,7 +19,9 @@ if (require.main === module) {
 }
 
 function render() {
-  const templateContents = fs.readFileSync(path.join(__dirname, "index.hbs")).toString();
+  const templateContents = fs
+    .readFileSync(path.join(__dirname, "index.hbs"))
+    .toString();
   const hbsRenderer = hbs.compile(templateContents);
 
   const gitdir = path.dirname(babiliPreset);
@@ -33,11 +35,10 @@ function render() {
       tree: "master"
     });
   } else {
-    githubPromise = getPullRequest(branchName)
-      .then(pr => ({
-        url: pr.html_url,
-        tree: "PR#" + pr.number
-      }));
+    githubPromise = getPullRequest(branchName).then(pr => ({
+      url: pr.html_url,
+      tree: "PR#" + pr.number
+    }));
   }
 
   return githubPromise
@@ -46,12 +47,12 @@ function render() {
       html: hbsRenderer({
         git: {
           branchName,
-          branchUrl: `${REPO_URL}/tree/${branchName}`,
+          branchUrl: `${REPO_URL}/tree/${branchName}`
         },
-        github,
+        github
       })
     }))
-    .then(({html, github}) => {
+    .then(({ html, github }) => {
       fs.writeFileSync(path.join(__dirname, "../index.html"), html);
       return github;
     })
@@ -60,36 +61,46 @@ function render() {
       return {
         branchName,
         github
-      }
+      };
     });
 }
 
 function getPullRequest(branchName) {
-  return getAllPullRequests(branchName)
-    .then(prs => prs[0]);
+  return getAllPullRequests(branchName).then(prs => prs[0]);
 }
 
 function getAllPullRequests(branchName) {
   return new Promise((resolve, reject) => {
-    request.get({
-      url: PR_API_URL + "?head=babel:" + branchName,
-      headers: {
-        "User-Agent": "request"
+    request.get(
+      {
+        url: PR_API_URL + "?head=babel:" + branchName,
+        headers: {
+          "User-Agent": "request"
+        }
+      },
+      function(err, resp, body) {
+        if (err) {
+          return reject(err);
+        }
+        if (resp.status < 200 || resp.status > 300) {
+          return reject(new Error("Response Error:\n" + body));
+        }
+        resolve(JSON.parse(body));
       }
-    }, function (err, resp, body) {
-      if (err) {
-        return reject(err);
-      }
-      if (resp.status < 200 || resp.status > 300) {
-        return reject(new Error("Response Error:\n" + body));
-      }
-      resolve(JSON.parse(body));
-    });
+    );
   });
 }
 
-function getBranchName(dir) {
+function getBranchName(gitdir) {
+  const currentDir = path.resolve(path.join(__dirname, "../"));
+
+  if (gitdir.indexOf(currentDir) === 0) {
+    return "master";
+  }
+
   return exec("git symbolic-ref -q --short head", {
-    cwd: dir
-  }).toString().trim();
+    cwd: gitdir
+  })
+    .toString()
+    .trim();
 }
