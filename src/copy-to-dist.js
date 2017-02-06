@@ -5,7 +5,6 @@ if (require.main === module) {
   copy(path.join(__dirname, "../"), [
     "index.html",
     "favicon.ico",
-    "build",
     "static",
     "sw.js"
   ], path.join(__dirname, "../dist"));

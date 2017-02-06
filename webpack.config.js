@@ -3,11 +3,13 @@ const webpack = require("webpack");
 const BabiliPlugin = require("babili-webpack-plugin");
 const BabiliPreset = require("babel-preset-babili");
 
+const OUTPUTPATH = "./dist/build";
+
 module.exports = [
   {
     entry: "babel-preset-babili",
     output: {
-      path: "./build",
+      path: OUTPUTPATH,
       filename: "babel-preset-babili.js",
       library: "BabiliPreset",
     },
@@ -16,7 +18,6 @@ module.exports = [
         'process.env.NODE_ENV': '"production"'
       }),
       new webpack.optimize.OccurrenceOrderPlugin(),
-      new webpack.optimize.DedupePlugin(),
       new BabiliPlugin({
         comments: false,
         babili: BabiliPreset
@@ -27,7 +28,7 @@ module.exports = [
   {
     entry: "babel-core",
     output: {
-      path: "./build",
+      path: OUTPUTPATH,
       filename: "babel-core.js",
       library: "Babel"
     },
@@ -46,7 +47,6 @@ module.exports = [
         'debug/browser'
       ),
       new webpack.optimize.OccurrenceOrderPlugin(),
-      new webpack.optimize.DedupePlugin(),
       new BabiliPlugin({
         comments: false,
         babili: BabiliPreset
@@ -56,11 +56,11 @@ module.exports = [
       loaders: [
         {
           test: /\.json$/,
-          loader: "json"
+          loader: "json-loader"
         },
         {
           test: /\.js$/,
-          loader: "babel",
+          loader: "babel-loader",
           exclude: /node_modules/
         }
       ]
@@ -70,7 +70,7 @@ module.exports = [
   {
     entry: "sw-toolbox",
     output: {
-      path: "./build",
+      path: OUTPUTPATH,
       filename: "sw-toolbox.js",
       library: "toolbox"
     },
@@ -79,7 +79,6 @@ module.exports = [
         'process.env.NODE_ENV': '"production"'
       }),
       new webpack.optimize.OccurrenceOrderPlugin(),
-      new webpack.optimize.DedupePlugin(),
       new BabiliPlugin({
         comments: false,
         babili: BabiliPreset

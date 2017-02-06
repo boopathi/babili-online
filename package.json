@@ -19,12 +19,10 @@
     "babel-preset-babili": "^0.0.8",
     "babel-preset-es2016": "^6.16.0",
     "babili-webpack-plugin": "^0.0.6",
+    "fs-extra": "^1.0.0",
     "handlebars": "^4.0.6",
     "json-loader": "^0.5.4",
     "sw-toolbox": "^3.4.0",
-    "webpack": "v2.1.0-beta.25"
-  },
-  "dependencies": {
-    "fs-extra": "^1.0.0"
+    "webpack": "^2.2.1"
   }
 }
