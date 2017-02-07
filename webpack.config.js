@@ -53,7 +53,7 @@ module.exports = [
     },
     plugins: [
       new webpack.ContextReplacementPlugin(/.*/),
-      new webpack.NormalModuleReplacementPlugin(/debug\/node/, "debug/browser"),
+      new webpack.NormalModuleReplacementPlugin(/debug\/node/, "debug/src/browser"),
       ...PROD_PLUGINS
     ]
   },
