@@ -1,4 +1,4 @@
-importScripts("build/sw-toolbox.js");
+import toolbox from "sw-toolbox";
 
 toolbox.cache.name = "babili-" + 6;
 

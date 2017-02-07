@@ -1,88 +1,77 @@
 const path = require("path");
 const webpack = require("webpack");
 const BabiliPlugin = require("babili-webpack-plugin");
-const BabiliPreset = require("babel-preset-babili");
 
-const OUTPUTPATH = "./dist/build";
+const DISTDIR = path.join(__dirname, "dist");
+const OUTDIR = path.join(DISTDIR, "static");
+const PUBPATH = "/static/";
+
+const PROD_PLUGINS = process.env.NODE_ENV === "production" ? [new webpack.DefinePlugin({
+        "process.env.NODE_ENV": '"production"'
+      }), new BabiliPlugin(), new webpack.optimize.OccurrenceOrderPlugin()] : [];
 
 module.exports = [
   {
-    entry: "babel-preset-babili",
+    entry: "./app/index.js",
     output: {
-      path: OUTPUTPATH,
-      filename: "babel-preset-babili.js",
-      library: "BabiliPreset",
+      filename: "app.js",
+      path: OUTDIR,
+      publicPath: PUBPATH
     },
-    plugins: [
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': '"production"'
-      }),
-      new webpack.optimize.OccurrenceOrderPlugin(),
-      new BabiliPlugin({
-        comments: false,
-        babili: BabiliPreset
-      })
-    ]
-  },
-  // babel
-  {
-    entry: "babel-core",
-    output: {
-      path: OUTPUTPATH,
-      filename: "babel-core.js",
-      library: "Babel"
-    },
-    externals: {
-      fs: "fs",
-      net: "net",
-      module: "module"
-    },
-    plugins: [
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': '"production"'
-      }),
-      new webpack.ContextReplacementPlugin(/.*/),
-      new webpack.NormalModuleReplacementPlugin(
-        /debug\/node/,
-        'debug/browser'
-      ),
-      new webpack.optimize.OccurrenceOrderPlugin(),
-      new BabiliPlugin({
-        comments: false,
-        babili: BabiliPreset
-      })
-    ],
     module: {
-      loaders: [
-        {
-          test: /\.json$/,
-          loader: "json-loader"
-        },
+      rules: [
         {
           test: /\.js$/,
-          loader: "babel-loader",
+          use: ["babel-loader"],
           exclude: /node_modules/
         }
       ]
-    }
+    },
+    plugins: PROD_PLUGINS
   },
-  // sw-toolbox
   {
-    entry: "sw-toolbox",
+    entry: "./app/worker.js",
     output: {
-      path: OUTPUTPATH,
-      filename: "sw-toolbox.js",
-      library: "toolbox"
+      filename: "worker.js",
+      path: OUTDIR,
+      publicPath: PUBPATH
+    },
+    target: "webworker",
+    externals: {
+      fs: "self",
+      net: "self",
+      module: "self"
+    },
+    module: {
+      rules: [
+        {
+          test: /\.js$/,
+          use: ["babel-loader"],
+          exclude: /node_modules/
+        }
+      ]
     },
     plugins: [
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': '"production"'
-      }),
-      new webpack.optimize.OccurrenceOrderPlugin(),
-      new BabiliPlugin({
-        comments: false,
-        babili: BabiliPreset
-      })
+      new webpack.ContextReplacementPlugin(/.*/),
+      new webpack.NormalModuleReplacementPlugin(/debug\/node/, "debug/browser"),
+      ...PROD_PLUGINS
     ]
+  },
+  {
+    entry: "./app/sw.js",
+    output: {
+      filename: "sw.js",
+      path: DISTDIR
+    },
+    module: {
+      rules: [
+        {
+          test: /\.js$/,
+          use: ["babel-loader"],
+          exclude: /node_modules/
+        }
+      ]
+    },
+    plugins: PROD_PLUGINS
   }
 ];
